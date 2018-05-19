@@ -34,7 +34,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 path = sys.argv[1]
 targets = open(path,"r")
-vhostsf = open("vhosts.txt", "wb")
+vhostsf = open("vhosts.csv", "wb")
 counter=0
 context = ssl.create_default_context()
 context.check_hostname = False
