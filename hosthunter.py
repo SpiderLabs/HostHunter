@@ -19,7 +19,7 @@
 #
 # $ python hosthunter.py <targets.txt>
 #
-# $ cat vhosts.txt
+# $ cat vhosts.csv
 #
 
 import sys
@@ -35,6 +35,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 path = sys.argv[1]
 targets = open(path,"r")
 vhostsf = open("vhosts.csv", "wb")
+vhostsf.write("IP Address,Port/Protocol,Domains,Operating System,OS Version,Notes\n") #vhosts.csv Header
 counter=0
 context = ssl.create_default_context()
 context.check_hostname = False
@@ -75,7 +76,7 @@ for ip in targets:
 
     if hostnames != "":
         print "[+] Hostnames: \n%s" % hostnames
-        row = ip + "," + "443/tcp" + "," + hostnames.replace("\n"," ") + "\n"
+        row = "\"" + ip + "\"," + "\"443/tcp\"" + "," + "\"" + hostnames.replace("\n",",") + "\""  + "\n"
         counter += 1
         vhostsf.write(row)
     else:
