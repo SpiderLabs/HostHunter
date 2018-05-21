@@ -64,12 +64,10 @@ for ip in targets:
     try:
         # Hack to make things faster
         r = requests.get('https://%s' % ip, timeout=5,verify=False)
-
         cert=ssl.get_server_certificate((ip, 443))
         x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
         cert_hostname=x509.get_subject().CN
         hostnames +=cert_hostname
-        print cert_hostname
     except (requests.ConnectionError,requests.Timeout,socket.error) as e:
         pass
 
