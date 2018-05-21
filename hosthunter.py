@@ -53,10 +53,10 @@ for ip in targets:
 # Querying HackerTarget.com API
     try:
         r2 = urllib2.urlopen('https://api.hackertarget.com/reverseiplookup/?q=%s' % ip).read()
-        if r2.find("No DNS A records found") or r2.find("API") == -1:
-            hostnames=r2
-        else:
+        if r2.find("No DNS A records found") or r2.find("API"):
             hostnames=''
+        else:
+            hostnames=r2
     except urllib2.HTTPError as e:
         print "[*] Error connecting with HackerTarget.com API"
 
