@@ -6,7 +6,7 @@ A tool to efficiently discover annd extract hostnames over a large set of target
 
 ### Installation
 
-⋅⋅*Tested with Python 2.7.x.
+⋅⋅* Tested with Python 2.7.x.
 
 ```bash
 $ pip install -r requirements.txt
