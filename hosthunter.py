@@ -2,9 +2,9 @@
 # hosthunter.py
 # A simple & efficient tool to identify virtual hostnames.
 #
-# author: Andreas Georgiou
-# email : ageorgiou@trustwave.com
-# version: v1.0
+# Author : Andreas Georgiou (superhedgy)
+# Email  : ageorgiou@trustwave.com
+# Version: v1.0
 #
 # To do list:
 #   [ ] Search Bing.com
@@ -13,7 +13,6 @@
 #   [x] Hackertarget.com API
 #   [ ] FreeAPI Robtex
 #
-# Tested with Python 2.6.5
 #
 # Usage Example:
 #
@@ -54,12 +53,12 @@ for ip in targets:
 # Querying HackerTarget.com API
     try:
         r2 = urllib2.urlopen('https://api.hackertarget.com/reverseiplookup/?q=%s' % ip).read()
-        if r2.find("No DNS A records found") == -1:
+        if r2.find("No DNS A records found") or r2.find("API") == -1:
             hostnames=r2
         else:
             hostnames=''
     except urllib2.HTTPError as e:
-        print "Error connecting with HackerTarget.com API"
+        print "[*] Error connecting with HackerTarget.com API"
 
 # Fetch SSL certificate
     try:
@@ -86,14 +85,6 @@ for ip in targets:
 # END IF
 targets.close()
 
-##### Expiramnetal - Bing.com Implementation #####
-
-'''
-ht = requests.get('https://freeapi.robtex.com/ipquery/'%ip)
-print ht.content;
-
-### Delete Between Comments ###
-'''
 
 print "\n\n Reconnaissance Completed!\n"
 print "\n %s hostnames were discovered in %s sec\n\n" % (counter,round(time.time() - start_time,2))
