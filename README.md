@@ -4,7 +4,7 @@ HostHunter
 A tool to efficiently discover annd extract hostnames over a large set of target IP addresses.
 
 
-### Installation
+## Installation
 
 * Tested with Python 2.7.x.
 
@@ -13,7 +13,7 @@ $ pip install -r requirements.txt
 ```
 
 
-### Usage Example
+## Usage Example
 
 ```bash
 $ python hosthunter.py <targets.txt>
@@ -23,3 +23,5 @@ $ python hosthunter.py <targets.txt>
 $ cat vhosts.csv
 ```
 
+## Authors
+* **Andreas Georgiou** - find me on twitter - [@mr_andreasgeo](https://twitter.com/Mr_AndreasGeo)
