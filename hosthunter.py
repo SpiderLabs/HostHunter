@@ -21,6 +21,7 @@
 # $ cat vhosts.csv
 #
 
+import argparse
 import sys
 import ssl
 import socket
@@ -49,14 +50,15 @@ print " Author: ageorgiou@trustwave.com\n"
 for ip in targets:
     ip=ip.replace("\n","")
     print "\n[+] Target: %s" % ip
-
+    hostnames=''
 # Querying HackerTarget.com API
     try:
         r2 = urllib2.urlopen('https://api.hackertarget.com/reverseiplookup/?q=%s' % ip).read()
-        if r2.find("No DNS A records found") or r2.find("API"):
-            hostnames=''
-        else:
+
+        if (r2.find("No DNS A records found")==-1) and (r2.find("API count exceeded")==-1):
             hostnames=r2
+        else:
+            hostnames=''
     except urllib2.HTTPError as e:
         print "[*] Error connecting with HackerTarget.com API"
 
@@ -67,7 +69,7 @@ for ip in targets:
         cert=ssl.get_server_certificate((ip, 443))
         x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
         cert_hostname=x509.get_subject().CN
-        hostnames +=cert_hostname
+        hostnames = hostnames + cert_hostname
     except (requests.ConnectionError,requests.Timeout,socket.error) as e:
         pass
 
@@ -82,6 +84,9 @@ for ip in targets:
 
 # END IF
 targets.close()
+
+#  Robtex
+#  https://freeapi.robtex.com/pdns/reverse/193.56.46.229
 
 
 print "\n\n Reconnaissance Completed!\n"
