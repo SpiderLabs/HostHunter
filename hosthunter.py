@@ -1,17 +1,15 @@
 #
-# hosthunter.py
-# A simple & efficient tool to identify virtual hostnames.
+#    | $$  | $$                      | $$    | $$  | $$                      | $$
+#    | $$  | $$  /$$$$$$   /$$$$$$$ /$$$$$$  | $$  | $$ /$$   /$$ /$$$$$$$  /$$$$$$    /$$$$$$   /$$$$$$
+#    | $$$$$$$$ /$$__  $$ /$$_____/|_  $$_/  | $$$$$$$$| $$  | $$| $$__  $$|_  $$_/   /$$__  $$ /$$__  $$
+#    | $$__  $$| $$  \ $$|  $$$$$$   | $$    | $$__  $$| $$  | $$| $$  \ $$  | $$    | $$$$$$$$| $$  \__/
+#    | $$  | $$| $$  | $$ \____  $$  | $$ /$$| $$  | $$| $$  | $$| $$  | $$  | $$ /$$| $$_____/| $$
+#    | $$  | $$|  $$$$$$/ /$$$$$$$/  |  $$$$/| $$  | $$|  $$$$$$/| $$  | $$  |  $$$$/|  $$$$$$$| $$
+#    |__/  |__/ \______/ |_______/    \___/  |__/  |__/ \______/ |__/  |__/   \___/   \_______/|__/1
 #
 # Author : Andreas Georgiou (superhedgy)
 # Email  : ageorgiou@trustwave.com
 # Version: v1.0
-#
-# To do list:
-#   [ ] Search Bing.com
-#   [x] Capture hostnames from SSL certificates (Invalid and Valid)
-#   [x] Basic verification of hostnames
-#   [x] Hackertarget.com API
-#   [ ] FreeAPI Robtex
 #
 #
 # Usage Example:
@@ -45,6 +43,7 @@ context.load_default_certs()
 start_time = time.time()
 print "\n HostHunter v1.0"
 print " Author: ageorgiou@trustwave.com\n"
+version='v1.0'
 
 # Read targets.txt file
 for ip in targets:
