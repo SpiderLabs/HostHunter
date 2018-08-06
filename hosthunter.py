@@ -9,7 +9,7 @@
 #
 # Author : Andreas Georgiou (superhedgy)
 # Email  : ageorgiou@trustwave.com
-# Version: v1.0
+# Version: v1.1
 #
 #
 # [+] Usage Example:
@@ -30,7 +30,7 @@ import urllib
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-version="v1.0"
+version="v1.1"
 path = sys.argv[1]
 targets = open(path,"rt")
 vhostsf = open("vhosts.csv", "wt")
@@ -55,15 +55,16 @@ banner=(
 print ("%s" % banner)
 print ("\n" ,"HostHunter", version)
 print (" Author: ageorgiou@trustwave.com\n")
+
 # Read targets.txt file
 for ip in targets:
     ip=ip.replace("\n","")
     print ("\n[+] Target: %s" % ip)
     hostnames=''
+
 # Querying HackerTarget.com API
     try:
         r2 = urllib.request.urlopen('https://api.hackertarget.com/reverseiplookup/?q=%s' % ip).read().decode("UTF-8")
-    #    print ("Here %s" % r2)
         if (r2.find("No DNS A records found")==-1) and (r2.find("API count exceeded")==-1):
             hostnames=r2
         else:
@@ -95,11 +96,10 @@ for ip in targets:
 targets.close()
 
 #  Robtex
-#  https://freeapi.robtex.com/pdns/reverse/193.56.46.229
+#  https://freeapi.robtex.com/pdns/reverse/$ip
 
 print ("|" + "-" * 65 + "|", end = "\n\n")
 print ("  Reconnaissance Completed!", end = "\n\n")
-#print ("  %s hostnames were discovered in %s sec" % (counter,round(time.time() - start_time,2)), end = "\n\n")
 if counter==0:
     print ("  1 hostname was discovered in %s sec" % (round(time.time() - start_time,2)), end = "\n\n")
 else:
