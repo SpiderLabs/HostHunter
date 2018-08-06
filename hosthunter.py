@@ -85,7 +85,7 @@ for ip in targets:
     if hostnames != "":
         print ("[+] Hostnames: \n%s" % hostnames)
         row = "\"" + ip + "\"," + "\"443/tcp\"" + "," + "\"" + hostnames.replace("\n",",") + "\""  + "\n"
-        counter += hostnames.count('\n')
+        counter += hostnames.count('\n') + 1
         vhostsf.write(row)
     else:
         print ("[-] Hostnames: no results ")
