@@ -97,6 +97,12 @@ targets.close()
 #  Robtex
 #  https://freeapi.robtex.com/pdns/reverse/193.56.46.229
 
-print ("-" * 50)
-print ("\n\n Reconnaissance Completed!\n")
-print ("\n %s hostnames were discovered in %s sec\n\n" % (counter,round(time.time() - start_time,2)))
+print ("|" + "-" * 65 + "|", end = "\n\n")
+print ("  Reconnaissance Completed!", end = "\n\n")
+#print ("  %s hostnames were discovered in %s sec" % (counter,round(time.time() - start_time,2)), end = "\n\n")
+if counter==0:
+    print ("  1 hostname was discovered in %s sec" % (round(time.time() - start_time,2)), end = "\n\n")
+else:
+    print ("  %s hostnames were discovered in %s sec" % (counter,round(time.time() - start_time,2)), end = "\n\n")
+
+print ("|" + "-" * 65 + "|")
