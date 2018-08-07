@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 #
 #    | $$  | $$                      | $$    | $$  | $$                      | $$
 #    | $$  | $$  /$$$$$$   /$$$$$$$ /$$$$$$  | $$  | $$ /$$   /$$ /$$$$$$$  /$$$$$$    /$$$$$$   /$$$$$$
@@ -58,17 +59,22 @@ print (" Author: ageorgiou@trustwave.com\n")
 
 # Read targets.txt file
 for ip in targets:
+    hname = [] #Decleare List
     ip=ip.replace("\n","")
     print ("\n[+] Target: %s" % ip)
     hostnames=''
 
-# Querying HackerTarget.com API
+    # Querying HackerTarget.com API
     try:
         r2 = urllib.request.urlopen('https://api.hackertarget.com/reverseiplookup/?q=%s' % ip).read().decode("UTF-8")
         if (r2.find("No DNS A records found")==-1) and (r2.find("API count exceeded")==-1):
-            hostnames=r2
+            for host in r2.split('\n'):
+                if (host=="") or (host in hname):
+                    pass
+                else:
+                    hname.append(host)
         else:
-            hostnames=''
+            pass
     except urllib.error.HTTPError as e:
         print ("[*] Error connecting with HackerTarget.com API")
 
@@ -79,15 +85,27 @@ for ip in targets:
         cert=ssl.get_server_certificate((ip, 443))
         x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
         cert_hostname=x509.get_subject().CN
-        hostnames = hostnames + cert_hostname
+
+        #### Add Items to List ####
+        for host in cert_hostname.split('\n'):
+            if (host=="") or (host in hname):
+                pass
+            else:
+                hname.append(host)
     except (requests.ConnectionError,requests.Timeout,socket.error) as e:
         pass
 
-    if hostnames != "":
-        print ("[+] Hostnames: \n%s" % hostnames)
-        row = "\"" + ip + "\"," + "\"443/tcp\"" + "," + "\"" + hostnames.replace("\n",",") + "\""  + "\n"
-        counter += hostnames.count('\n') + 1
+    if hname:
+        print ("[+] Hostnames: ", end = "\n")
+        for item in hname:
+            print (item)
+            counter += 1
+
+    # Write output to .CSV file
+        hostnames = ','.join(hname) # Merging the lists prooved Faster than list iterations
+        row = "\"" + ip + "\"," + "\"443/tcp\"" + "," + "\"" + hostnames + "\""  + "\n"
         vhostsf.write(row)
+
     else:
         print ("[-] Hostnames: no results ")
         continue
@@ -98,7 +116,7 @@ targets.close()
 #  Robtex
 #  https://freeapi.robtex.com/pdns/reverse/$ip
 
-print ("|" + "-" * 65 + "|", end = "\n\n")
+print ("\n" + "|" + "-" * 65 + "|", end = "\n\n")
 print ("  Reconnaissance Completed!", end = "\n\n")
 if counter==0:
     print ("  1 hostname was discovered in %s sec" % (round(time.time() - start_time,2)), end = "\n\n")
