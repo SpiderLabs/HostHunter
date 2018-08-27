@@ -1,4 +1,4 @@
-HostHunter
+HostHunter v1.5
 ======
 
 A tool to efficiently discover and extract hostnames over a large set of target IP addresses. HostHunter utilises the HackerTarget API to enchance the results. It generates a vhosts.csv file containing the results of the reconnaissance.
@@ -6,7 +6,7 @@ A tool to efficiently discover and extract hostnames over a large set of target 
 
 ## Installation
 
-* Tested with Python 2.7.x.
+* Tested with Python 3.x.
 
 ```bash
 $ pip install -r requirements.txt
@@ -23,11 +23,16 @@ $ python hosthunter.py <targets.txt>
 $ cat vhosts.csv
 ```
 
+## New Features
+[x] Works with Python3
+[x] Scraps Bing.com for results
+[ ] Supports .txt and .csv output file formats.
+[ ] Supports IPv6 targets.
 
 ## Notes
 
 * Free APIs throttle the amount of requests per day per source IP address.
-* HostHunter v2.0 is comming soon.
+* HostHunter v2.0 is coming soon.
 
 ## Authors
 * **Andreas Georgiou** - find me on twitter - [@mr_andreasgeo](https://twitter.com/Mr_AndreasGeo)
