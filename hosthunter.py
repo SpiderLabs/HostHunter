@@ -28,21 +28,28 @@ import time
 import requests
 import OpenSSL
 import urllib
+import re
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
+# Constants
 version="v1.1"
-path = sys.argv[1]
-targets = open(path,"rt")
-vhostsf = open("vhosts.csv", "wt")
-vhostsf.write("IP Address,Port/Protocol,Domains,Operating System,OS Version,Notes\n") #vhosts.csv Header
+these_regex="<cite>(.+?)</cite>"
 counter=0
 context = ssl.create_default_context()
 context.check_hostname = False
 context.verify_mode = ssl.CERT_OPTIONAL
 context.load_default_certs()
+regx = "<cite>(.+?)</cite>"
+pattern=re.compile(regx)
+# Write to output file
+path = sys.argv[1]
+targets = open(path,"rt")
+# .CSV file output
+vhostsf = open("vhosts.csv", "wt")
+vhostsf.write("\"" + "IP Address" + "\",\"" + "Port/Protocol" + "\",\"" + "Domains" +  "\",\"" +
+"Operating System" + "\",\"" + "OS Version" + "\",\"" + "Notes" +  "\"\n") #vhosts.csv Header
 
-start_time = time.time()
 banner=(
     " | $$  | $$                      | $$    | $$  | $$                      | $$\n"
     " | $$  | $$  /$$$$$$   /$$$$$$$ /$$$$$$  | $$  | $$ /$$   /$$ /$$$$$$$  /$$$$$$    /$$$$$$   /$$$$$$\n"
@@ -54,9 +61,9 @@ banner=(
 )
 
 print ("%s" % banner)
-print ("\n" ,"HostHunter", version)
+print ("\n" ,"nter", version)
 print (" Author: ageorgiou@trustwave.com\n")
-
+start_time = time.time()
 # Read targets.txt file
 for ip in targets:
     hname = [] #Decleare List
@@ -78,10 +85,36 @@ for ip in targets:
     except urllib.error.HTTPError as e:
         print ("[*] Error connecting with HackerTarget.com API")
 
+
+    # Querying Bing.com
+    try:
+        r3 = urllib.request.urlopen('https://www.bing.com/search?q=ip%%3a%s' % ip).read().decode("UTF-8")
+        bing_results = re.findall(pattern,r3)
+
+        #print (r3)
+        #print (bing_results)
+
+        for item in bing_results:
+            #host = item.replace('<strong>','')
+            item2 = re.sub("<.[a-z]+>","",item)
+            host  = re.sub("http[s]://","",item2)
+            if "\/" in host:
+                print ('TEST')
+            print(host)
+            if (host=="") or (host in hname):
+                pass
+            else:
+                #print (host)
+                hname.append(host)
+    except urllib.error.HTTPError as e:
+        print ("[*] Error accessing Bing.com")
+
+    exit()
+
 # Fetch SSL certificate
     try:
         # Hack to make things faster
-        r = requests.get('https://%s' % ip, timeout=5,verify=False)
+        r = requests.get('https://%s' % ip, timeout=4,verify=False)
         cert=ssl.get_server_certificate((ip, 443))
         x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
         cert_hostname=x509.get_subject().CN
@@ -101,9 +134,9 @@ for ip in targets:
             print (item)
             counter += 1
 
-    # Write output to .CSV file
+        # Write output to .CSV file
         hostnames = ','.join(hname) # Merging the lists prooved Faster than list iterations
-        row = "\"" + ip + "\"," + "\"443/tcp\"" + "," + "\"" + hostnames + "\""  + "\n"
+        row = "\"" + ip + "\"," + "\"443/tcp\"" + "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
         vhostsf.write(row)
 
     else:
@@ -113,6 +146,7 @@ for ip in targets:
 # END IF
 targets.close()
 
+# IPV6 https://[%ip6]
 #  Robtex
 #  https://freeapi.robtex.com/pdns/reverse/$ip
 
