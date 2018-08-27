@@ -27,7 +27,7 @@ $ cat vhosts.csv
 ## Notes
 
 * Free APIs throttle the amount of requests per day per source IP address.
-
+* HostHunter v2.0 is comming soon.
 
 ## Authors
 * **Andreas Georgiou** - find me on twitter - [@mr_andreasgeo](https://twitter.com/Mr_AndreasGeo)
