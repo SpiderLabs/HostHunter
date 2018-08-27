@@ -24,15 +24,20 @@ $ cat vhosts.csv
 ```
 
 ## New Features
-[x] Works with Python3
-[x] Scraps Bing.com for results
-[ ] Supports .txt and .csv output file formats.
-[ ] Supports IPv6 targets.
+[x] Works with Python3  
+[x] Scraps Bing.com for results  
+[ ] Supports .txt and .csv output file formats.  
+[ ] Validate target IPv4 & IPv6 addresses.  
+[ ] Supports IPv6 targets.  
+[ ] Validate output hostnames.  
+[ ] BruteForce possible sub-domains.  
+[ ] Remove duplicates.  
 
 ## Notes
 
 * Free APIs throttle the amount of requests per day per source IP address.
 * HostHunter v2.0 is coming soon.
+
 
 ## Authors
 * **Andreas Georgiou** - find me on twitter - [@mr_andreasgeo](https://twitter.com/Mr_AndreasGeo)
