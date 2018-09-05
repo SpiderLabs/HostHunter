@@ -10,7 +10,7 @@
 #
 # Author : Andreas Georgiou (superhedgy)
 # Email  : ageorgiou@trustwave.com
-# Version: v1.1
+# Version: v1.5
 #
 #
 # [+] Usage Example:
@@ -33,7 +33,9 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # Constants
-version="v1.1"
+version="1.5"
+last_update= "27/10/2018"
+author= "Andreas Georgiou (superhedgy)"
 these_regex="<cite>(.+?)</cite>"
 counter=0
 context = ssl.create_default_context()
@@ -42,13 +44,39 @@ context.verify_mode = ssl.CERT_OPTIONAL
 context.load_default_certs()
 regx = "<cite>(.+?)</cite>"
 pattern=re.compile(regx)
-# Write to output file
-path = sys.argv[1]
-targets = open(path,"rt")
-# .CSV file output
-vhostsf = open("vhosts.csv", "wt")
-vhostsf.write("\"" + "IP Address" + "\",\"" + "Port/Protocol" + "\",\"" + "Domains" +  "\",\"" +
-"Operating System" + "\",\"" + "OS Version" + "\",\"" + "Notes" +  "\"\n") #vhosts.csv Header
+
+## Argument Parser
+parser = argparse.ArgumentParser(
+description='< HostHunter Help Page >',
+epilog="Author: ageorgiou@trustwave.com"
+)
+## nargs='?' to capture mutliple variables
+parser.add_argument("-V","--version",help="Displays the currenct version.",action="store_true",default=False)
+parser.add_argument("targets",help="Sets the path of the target IPs file." , type=str, default="targets.txt")
+parser.add_argument("-f","--format",help="Choose between CSV and TXT output file formats.", default="csv")
+parser.add_argument("-o","--output", help="Sets the path of the output file.", type=str,default="vhosts.csv")
+parser.add_argument("-b","--bing",help="Use Bing.com search engine to discover more hostnames associated with the target IP addreses.",action="store_true",default=False)
+args = parser.parse_args()
+
+if args.format.lower() != "txt" and args.format.lower() != "csv":
+    print ("\nUnrecognised file format argument. Choose between 'txt' or 'csv' output file formats.\n")
+    print("Example Usage: python3 hosthunter.py targets.txt -f txt ")
+    exit()
+
+if args.version:
+    print("HostHunter version",version)
+    print("Last Updated:",last_update)
+    print("Author:", author)
+    exit()
+
+# Targets Input File
+targets = open(args.targets,"rt")
+# # Write to a .CSV file
+vhostsf = open(args.output, "wt")
+
+if args.format.lower() == "csv":
+    vhostsf.write("\"" + "IP Address" + "\",\"" + "Port/Protocol" + "\",\"" + "Domains" +  "\",\""
+    + "Operating System" + "\",\"" + "OS Version" + "\",\"" + "Notes" +  "\"\n") #vhosts.csv Header
 
 banner=(
     " | $$  | $$                      | $$    | $$  | $$                      | $$\n"
@@ -61,7 +89,7 @@ banner=(
 )
 
 print ("%s" % banner)
-print ("\n" ,"nter", version)
+print ("\n" ,"HostHunter: ", version)
 print (" Author: ageorgiou@trustwave.com\n")
 start_time = time.time()
 # Read targets.txt file
@@ -87,29 +115,22 @@ for ip in targets:
 
 
     # Querying Bing.com
-    try:
-        r3 = urllib.request.urlopen('https://www.bing.com/search?q=ip%%3a%s' % ip).read().decode("UTF-8")
-        bing_results = re.findall(pattern,r3)
-
-        #print (r3)
-        #print (bing_results)
-
-        for item in bing_results:
-            #host = item.replace('<strong>','')
-            item2 = re.sub("<.[a-z]+>","",item)
-            host  = re.sub("http[s]://","",item2)
-            if "\/" in host:
-                print ('TEST')
-            print(host)
-            if (host=="") or (host in hname):
-                pass
-            else:
-                #print (host)
-                hname.append(host)
-    except urllib.error.HTTPError as e:
-        print ("[*] Error accessing Bing.com")
-
-    exit()
+    if args.bing == True:
+        try:
+            r3 = urllib.request.urlopen('https://www.bing.com/search?q=ip%%3a%s' % ip).read().decode("UTF-8")
+            bing_results = re.findall(pattern,r3)
+            for item in bing_results:
+                item2 = re.sub("<.[a-z]+>","",item)
+                host  = re.sub("http[s]://","",item2)
+                if "\/" in host:
+                    print ('TEST')
+                    print(host)
+                if (host=="") or (host in hname):
+                    pass
+                else:
+                    hname.append(host)
+        except urllib.error.HTTPError as e:
+            print ("[*] Error accessing Bing.com")
 
 # Fetch SSL certificate
     try:
@@ -132,12 +153,14 @@ for ip in targets:
         print ("[+] Hostnames: ", end = "\n")
         for item in hname:
             print (item)
+            vhostsf.write(item + "\n")
             counter += 1
 
-        # Write output to .CSV file
-        hostnames = ','.join(hname) # Merging the lists prooved Faster than list iterations
-        row = "\"" + ip + "\"," + "\"443/tcp\"" + "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
-        vhostsf.write(row)
+        if args.format.lower() == 'csv':
+            # Write output to .CSV file
+            hostnames = ','.join(hname) # Merging the lists prooved Faster than list iterations
+            row = "\"" + ip + "\"," + "\"443/tcp\"" + "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
+            vhostsf.write(row)
 
     else:
         print ("[-] Hostnames: no results ")
