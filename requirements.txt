@@ -1,2 +1,0 @@
-requests==2.18.4
-pyOpenSSL==0.13.1
