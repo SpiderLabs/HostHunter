@@ -23,16 +23,14 @@ $ cat vhosts.csv
 ```
 
 ## New Features
-[x] Works with Python3  
-[x] Scraps Bing.com results  
-[x] Supports .txt and .csv output file formats.  
-[x] Validate target IPv4 & IPv6 addresses.  
-[x] Supports IPv6 targets.  
+[X] Works with Python3  
+[X] Scraps Bing.com results  
+[X] Supports .txt and .csv output file formats.  
+[X] Validate target IPv4 & IPv6 addresses.  
+[X] Supports IPv6 targets.  
+[X] Takes Screenshots
 [\_] Validate output hostnames.  
 [\_] BruteForce possible sub-domains.  
-[x] Remove duplicates
-[x] Takes Screenshots
-[\_] Store output in a SQL DB  
 
 ## Notes
 
