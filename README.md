@@ -1,8 +1,7 @@
-HostHunter v1.5
+HostHunter v1.0
 ======
 
 A tool to efficiently discover and extract hostnames over a large set of target IP addresses. HostHunter utilises the HackerTarget API to enchance the results. It generates a vhosts.csv file containing the results of the reconnaissance.
-
 
 ## Installation
 
@@ -25,13 +24,15 @@ $ cat vhosts.csv
 
 ## New Features
 [x] Works with Python3  
-[x] Scraps Bing.com for results  
-[ ] Supports .txt and .csv output file formats.  
-[ ] Validate target IPv4 & IPv6 addresses.  
-[ ] Supports IPv6 targets.  
+[x] Scraps Bing.com results  
+[x] Supports .txt and .csv output file formats.  
+[x] Validate target IPv4 & IPv6 addresses.  
+[x] Supports IPv6 targets.  
 [ ] Validate output hostnames.  
 [ ] BruteForce possible sub-domains.  
-[ ] Remove duplicates.  
+[x] Remove duplicates
+[x] Takes Screenshots
+[ ] Store output in a SQL DB  
 
 ## Notes
 
@@ -41,4 +42,3 @@ $ cat vhosts.csv
 
 ## Authors
 * **Andreas Georgiou** - find me on twitter - [@mr_andreasgeo](https://twitter.com/Mr_AndreasGeo)
-
