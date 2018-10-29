@@ -135,7 +135,7 @@ def take_screenshot(IP,port):
 
     #print ("Printing the SC URL",url)
     try:
-        driver.implicitly_wait(5)
+        driver.implicitly_wait(10)
         driver.get(url)
         driver.get_screenshot_as_file(sc_path+"/"+IP+"_443.png")
     except:
@@ -197,7 +197,7 @@ def main(argc):
                 for item in bing_results:
                     url = re.findall("(http(s)?://[^\s]+)",item)[0][0]
                     item = re.sub("\"","",url)
-                    hostx.apps.append(url)
+                    hostx.apps.append(item)
                     host = re.sub("(http(s)?://)","",item)
                     host2 = re.sub("/(.)*","",host)
                 #    print (host);
@@ -240,7 +240,7 @@ def main(argc):
                 row = "\"" + ip + "\"," + "\"443/tcp\"" + "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
                 vhostsf.write(row)
 
-                if args.bing:
+                if (args.bing == True and hostx.apps):
                     apps = ','.join(hostx.apps)
                     row = "\"" + hostx.address + "\"," + "\"443/tcp\"" + "," + "\"" + apps + "\"" + "\n"
                     appsf.write(row)
@@ -249,7 +249,7 @@ def main(argc):
             print ("[-] Hostnames: no results ")
             continue
 
-        if (args.bing == True):
+        if (args.bing == True and hostx.apps):
             print ("[+] Web Apps:")
             for url in hostx.apps:
                 print (url)
