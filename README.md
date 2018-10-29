@@ -28,11 +28,11 @@ $ cat vhosts.csv
 [x] Supports .txt and .csv output file formats.  
 [x] Validate target IPv4 & IPv6 addresses.  
 [x] Supports IPv6 targets.  
-[ ] Validate output hostnames.  
-[ ] BruteForce possible sub-domains.  
+[\_] Validate output hostnames.  
+[\_] BruteForce possible sub-domains.  
 [x] Remove duplicates
 [x] Takes Screenshots
-[ ] Store output in a SQL DB  
+[\_] Store output in a SQL DB  
 
 ## Notes
 
