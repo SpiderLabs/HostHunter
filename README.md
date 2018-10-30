@@ -4,9 +4,26 @@ HostHunter v1.0
 A tool to efficiently discover and extract hostnames over a large set of target IP addresses. HostHunter utilises the HackerTarget API to enchance the results. It generates a vhosts.csv file containing the results of the reconnaissance.
 
 ## Installation
+<<<<<<< HEAD
 
 * Tested with Python 3.x.
 
+=======
+* Tested with Python 3.x.
+
+- Linux
+* Use wget command to download a latest Google Chrome debian package
+
+```bash
+
+$ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+$ dpkg -i ./google-chrome-stable_current_amd64.deb
+
+$ sudo apt-get install -f
+```
+
+>>>>>>> Initial Commit
 ```bash
 $ pip install -r requirements.txt
 ```
