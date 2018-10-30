@@ -3,11 +3,11 @@ HostHunter v1.0
 
 A tool to efficiently discover and extract hostnames over a large set of target IP addresses. HostHunter utilises the HackerTarget API to enchance the results. It generates a vhosts.csv file containing the results of the reconnaissance.
 
-[![asciicast|small](https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png)](https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt)
-
+## Demo
+* Currently GitLab's markup language does not support HTML or CSS control over the images, thus the following link thumbnaul is huge.
+[![asciicast](https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png)](https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt)
 
 ## Installation
-
 * Tested with Python 3.x.
 
 ### Linux
