@@ -1,6 +1,3 @@
 requests==2.18.4
-<<<<<<< HEAD
-=======
 selenium==3.14.1
->>>>>>> Initial Commit
 pyOpenSSL==18.0.0
