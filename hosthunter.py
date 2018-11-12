@@ -37,6 +37,9 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
+# Beta Feature
+os.environ['http_proxy']=''
+
 # Constants
 _name="HostHunter"
 _version="1.5"
@@ -61,7 +64,7 @@ pattern_v4 = re.compile(regx_v4)
 pattern_v6 = re.compile(regx_v6)
 pattern=re.compile(regx)
 # Hack to make things faster
-socket.setdefaulttimeout(5)
+socket.setdefaulttimeout(3)
 
 
 ## Argument Parser
@@ -93,6 +96,12 @@ if args.version:
 if not os.path.exists(args.targets):
     print("\n[*] Error: targets file",args.targets,"does not exist.\n")
     exit()
+
+if os.path.exists(args.output):
+    print("\n[?] {} file already exists, would you like to overwrite it?".format(args.output))
+    answer = input("Answer with [Y]es or [N]o : ").lower()
+    if (answer == 'no' or answer == 'n'):
+        exit()
 
 targets = open(args.targets,"rt") # Read File
 vhostsf = open(args.output, "wt") # Write File
@@ -185,7 +194,7 @@ def main(argc):
                         hostx.hname.append(host)
             else:
                 pass
-        except (urllib.error.HTTPError,socket.timeout) as e:
+        except (urlib.URLError,urllib.error.HTTPError,socket.timeout) as e:
             print ("[*] Error: connecting with HackerTarget.com API")
 
         # Querying Bing.com
