@@ -26,12 +26,12 @@ import os
 import ssl
 import socket
 import time
-import requests
-import OpenSSL
-import urllib
 import re
 
 # External Libraries
+import OpenSSL
+import urllib3
+import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 from selenium import webdriver
@@ -43,12 +43,14 @@ os.environ['http_proxy']=''
 # Constants
 _name="HostHunter"
 _version="1.5"
-_author="Andreas Georiou"
+_author="Andreas Georiou (superhedgy)"
 _last_update= "20/11/2018"
-_author= "Andreas Georgiou (superhedgy)"
 
 # Options
 chrome_opt = Options()
+chrome_opt.add_argument("--ignore-certificate-errors")
+chrome_opt.add_argument("--test-type")
+
 #chrome_opt.add_argument("--headless")
 DRIVER = 'chromedriver'
 sc_path = 'screen_captures'
@@ -69,7 +71,7 @@ socket.setdefaulttimeout(3)
 
 ## Argument Parser
 parser = argparse.ArgumentParser(
-description='|<--- HostHunter Help Page --->|',
+description='|<--- HostHunter v1.5 - Help Page --->|',
 epilog="Author: " + _author
 )
 
@@ -137,25 +139,18 @@ class target:
         self.ipv6 = False
 
 def take_screenshot(IP,port):
-    if port == 443:
+    if port == "443":
         url="https://" + IP
-    elif (port == 80 or port == 8080):
-        url="http://" + IP
-
-    #print ("Printing the SC URL",url)
+    else:
+        url="http://" + IP+":"+port
+    print ("Printing the SC URL",url)
     try:
-        driver.implicitly_wait(10)
+        #driver.implicitly_wait(15)
         driver.get(url)
-        driver.get_screenshot_as_file(sc_path+"/"+IP+"_443.png")
+        print ("Taking Screenshot:",url)
+        driver.save_screenshot(sc_path+"/"+IP+"_"+port+".png")
     except:
         pass
-        #print("timeout")
-
-def brute_force():
-    print("Brute Force")
-    # https://findsubdomains.com/top-subdomain-name-count
-    # https://github.com/rbsec/dnscan/blob/master/subdomains-100.txt
-    # https://www.virustotal.com/en/domain/andreasgeo.com/information/
 
 def validate(targ):
     #print(IP)
@@ -180,29 +175,33 @@ def main(argc):
 
         print ("\n[+] Target: %s" % hostx.address)
         # Querying HackerTarget.com API
-
         try:
-        #    http = urllib3.PoolManager()
+            http = urllib3.PoolManager()
         #    r3 = http.request('GET', 'https://api.hackertarget.com/reverseiplookup/?q=%s' % ip,decode_content=True).read().decode("UTF-8")
         #    print (r3)
-            r2 = urllib.request.urlopen('https://api.hackertarget.com/reverseiplookup/?q=%s' % ip).read().decode("UTF-8")
+        #    r2 = urllib3.request.urlopen('https://api.hackertarget.com/reverseiplookup/?q=%s' % ip).read().decode("UTF-8")
+            r2 = http.request('GET', 'https://api.hackertarget.com/reverseiplookup/?q=%s' % ip,decode_content=True).read().decode("UTF-8")
             if (r2.find("No DNS A records found")==-1) and (r2.find("API count exceeded")==-1 and r2.find("error")==-1):
                 for host in r2.split('\n'):
                     if (host=="") or (host in hostx.hname):
                         pass
                     else:
                         hostx.hname.append(host)
+            # Add API count exceed detection
             else:
                 pass
-        except (urlib.URLError,urllib.error.HTTPError,socket.timeout) as e:
+        except (urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError) as e:
             print ("[*] Error: connecting with HackerTarget.com API")
 
         # Querying Bing.com
         if args.bing == True:
             try:
-                r3 = urllib.request.urlopen('https://www.bing.com/search?q=ip%%3a%s' % ip).read().decode("UTF-8")
-                bing_response = re.findall(pattern,r3)
-                bing_results = bing_response #bing_response[7:]
+                http = urllib3.PoolManager()
+                #r3 = urllib3.request.urlopen('https://www.bing.com/search?q=ip%%3a%s' % ip).read().decode("UTF-8")
+                r3 = http.request('GET','https://www.bing.com/search?q=ip%%3a%s' % ip,decode_content=True)
+                response= r3.data.decode('utf-8')
+                bing_results = re.findall(pattern,response)
+                #print (bing_results)
                 for item in bing_results:
                     url = re.findall("(http(s)?://[^\s]+)",item)[0][0]
                     item = re.sub("\"","",url)
@@ -214,17 +213,19 @@ def main(argc):
                         pass
                     else:
                         hostx.hname.append(host2)
-            except (urllib.error.HTTPError,socket.timeout) as e:
+            except (urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError) as e:
                 print ("[*] Error: connecting with Bing.com")
 
+        # Capture Screenshots with -cs option
+        if args.screen_capture == True:
+            take_screenshot(ip,"80")
+            take_screenshot(ip,"443")
+            take_screenshot(ip,"8080")
         # Fetch SSL Certificates
         try:
             cert=ssl.get_server_certificate((ip, 443))
             x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
             cert_hostname=x509.get_subject().CN
-            # Capture Screenshots with -cs option
-            if args.screen_capture == True:
-                take_screenshot(ip,443)
             # Add New HostNames to List
             for host in cert_hostname.split('\n'):
                 if (host=="") or (host in hostx.hname):
