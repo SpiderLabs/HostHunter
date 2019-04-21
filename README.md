@@ -1,15 +1,17 @@
-HostHunter v1.0
+HostHunter v1.5
 ======
 
-A tool to efficiently discover and extract hostnames over a large set of target IP addresses. HostHunter utilises the HackerTarget API to enchance the results. It generates a vhosts.csv file containing the results of the reconnaissance.
+A tool to efficiently discover and extract hostnames over a large set of target IP addresses. HostHunter utilises simple OSINT techniques. It generates a CSV file containing the results of the reconnaissance.
+
+Taking screenshots was also added as a beta functionality.
 
 ## Demo
-* Currently GitLab's markup language does not support HTML or CSS control over the images, thus the following link thumbnaul is huge.
+* Currently GitLab's markup language does not support HTML or CSS control over the images, thus the following link thumbnail is huge.
 
 [![asciicast](https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png)](https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt)
 
 ## Installation
-* Tested with Python 3.x.
+* Tested with Python 3.7.2.
 
 ### Linux
 * Use wget command to download a latest Google Chrome debian package.  
@@ -29,7 +31,7 @@ $ pip install -r requirements.txt
 ```
 
 
-## Usage Example
+## Simple Usage Example
 ```bash
 $ python hosthunter.py <targets.txt>
 ```
@@ -38,23 +40,30 @@ $ python hosthunter.py <targets.txt>
 $ cat vhosts.csv
 ```
 
-## New Features
+## Full Functionality Example
+```bash
+$ python hosthunter.py <targets.txt> -o hosts.csv -f csv --bing -sc
+```
+
+```bash
+$ cat hosts.csv
+```
+
+
+## Features
 [X] Works with Python3  
 [X] Scraps Bing.com results
 [X] Supports .txt and .csv output file formats  
-[X] Validate target IPv4 & IPv6 addresses  
-[X] Supports IPv6 targets  
+[X] Validate target IPv4 addresses  
 [X] Takes Screenshots  
-[\_] Validate output hostnames  
-[\_] BruteForce possible sub-domains  
+[X] Extracts hostnames from SSL certificates  
+[X] Utilises Hacker API  
 
 ## Notes
-* Free APIs throttle the amount of requests per day per source IP address.
-* HostHunter v2.0 is coming soon.
+* Free APIs throttle the amount of requests per day per source IP address..
 
 ##License
 This project is licensed under the MIT License.
 
-
 ## Authors
-* **Andreas Georgiou** - find me on twitter - [@mr_andreasgeo](https://twitter.com/Mr_AndreasGeo)
+* **Andreas Georgiou** - find me on twitter - [@superhedgy](https://twitter.com/superhedgy)
