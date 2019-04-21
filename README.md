@@ -49,7 +49,6 @@ $ python hosthunter.py <targets.txt> -o hosts.csv -f csv --bing -sc
 $ cat hosts.csv
 ```
 
-
 ## Features
 [X] Works with Python3  
 [X] Scraps Bing.com results
@@ -57,7 +56,10 @@ $ cat hosts.csv
 [X] Validate target IPv4 addresses  
 [X] Takes Screenshots  
 [X] Extracts hostnames from SSL certificates  
-[X] Utilises Hacker API  
+[X] Utilises Hacker Target API  
+
+## Coming Next
+[\_] Support HackerTarget API
 
 ## Notes
 * Free APIs throttle the amount of requests per day per source IP address..
