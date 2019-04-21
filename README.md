@@ -51,7 +51,7 @@ $ cat hosts.csv
 
 ## Features
 [X] Works with Python3  
-[X] Scraps Bing.com results
+[X] Scraps Bing.com results  
 [X] Supports .txt and .csv output file formats  
 [X] Validate target IPv4 addresses  
 [X] Takes Screenshots  
@@ -59,7 +59,7 @@ $ cat hosts.csv
 [X] Utilises Hacker Target API  
 
 ## Coming Next
-[\_] Support HackerTarget API
+[\_] Support for HackerTarget API key
 
 ## Notes
 * Free APIs throttle the amount of requests per day per source IP address..
@@ -69,4 +69,3 @@ This project is licensed under the MIT License.
 
 ## Authors
 * **Andreas Georgiou** - find me on twitter - [@superhedgy](https://twitter.com/superhedgy)
-
