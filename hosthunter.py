@@ -10,7 +10,7 @@
 #
 # Author  : Andreas Georgiou (superhedgy)
 # Email   : ageorgiou@trustwave.com
-# Twitter : @Mr_AndreasGeo
+# Twitter : @superhedgy
 # Version: v1.5
 #
 # [+] Simple Usage Example:
@@ -27,7 +27,7 @@ import ssl
 import socket
 import time
 import re
-
+import signal
 # External Libraries
 import OpenSSL
 import urllib3
@@ -41,17 +41,14 @@ from selenium.webdriver.chrome.options import Options
 os.environ['http_proxy']=''
 
 # Constants
-_name="HostHunter"
-_version="1.5"
-_author="Andreas Georiou (superhedgy)"
-_last_update= "20/11/2018"
+__version__="v1.5"
+__author__="Andreas Georgiou (superhedgy)"
 
 # Options
 chrome_opt = Options()
 chrome_opt.add_argument("--ignore-certificate-errors")
 chrome_opt.add_argument("--test-type")
-
-#chrome_opt.add_argument("--headless")
+chrome_opt.add_argument("--headless") #Comment out to Debug
 DRIVER = 'chromedriver'
 sc_path = 'screen_captures'
 context = ssl.create_default_context()
@@ -68,11 +65,10 @@ pattern=re.compile(regx)
 # Hack to make things faster
 socket.setdefaulttimeout(3)
 
-
 ## Argument Parser
 parser = argparse.ArgumentParser(
 description='|<--- HostHunter v1.5 - Help Page --->|',
-epilog="Author: " + _author
+epilog="Author: " + __author__
 )
 
 parser.add_argument("-V","--version",help="Displays the currenct version.",action="store_true",default=False)
@@ -89,9 +85,8 @@ if args.format.lower() != "txt" and args.format.lower() != "csv":
     exit()
 
 if args.version:
-    print("HostHunter version",version)
-    print("Last Updated:",_last_update)
-    print("Author:", _author)
+    print("HostHunter version",__version__)
+    print("Author:", __author__)
     exit()
 
 # Targets Input File
@@ -122,13 +117,13 @@ def display_banner():
         " | $$__  $$| $$  \ $$|  $$$$$$   | $$    | $$__  $$| $$  | $$| $$  \ $$  | $$    | $$$$$$$$| $$  \__/\n"
         " | $$  | $$| $$  | $$ \____  $$  | $$ /$$| $$  | $$| $$  | $$| $$  | $$  | $$ /$$| $$_____/| $$\n"
         " | $$  | $$|  $$$$$$/ /$$$$$$$/  |  $$$$/| $$  | $$|  $$$$$$/| $$  | $$  |  $$$$/|  $$$$$$$| $$\n"
-        " |__/  |__/ \______/ |_______/    \___/  |__/  |__/ \______/ |__/  |__/   \___/   \_______/|__/  " + _version + "\n"
+        " |__/  |__/ \______/ |_______/    \___/  |__/  |__/ \______/ |__/  |__/   \___/   \_______/|__/  " + __version__ + "\n"
     )
 
     print ("%s" % banner)
-    print ("\n" ,"HostHunter: ", _version)
-    print (" Author : ageorgiou@trustwave.com")
-    print (" Twitter: @mr_andreasgeo")
+    print ("\n" ,"HostHunter: ", __version__)
+    print (" Author : ", __author__)
+    print (" Twitter:  @superhedgy")
     print ("\n" + "|" + "-" * 95 + "|", end = "\n")
 
 class target:
@@ -139,21 +134,29 @@ class target:
         self.ipv6 = False
 
 def take_screenshot(IP,port):
+    source=default='<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body></html>'
+    time.sleep(0.5) # Delay
     if port == "443":
         url="https://" + IP
     else:
         url="http://" + IP+":"+port
-    print ("Printing the SC URL",url)
+    # print ("[Debug] Navigating to: ",url) # Debug Functionality
     try:
-        #driver.implicitly_wait(15)
         driver.get(url)
-        print ("Taking Screenshot:",url)
-        driver.save_screenshot(sc_path+"/"+IP+"_"+port+".png")
-    except:
+    except (urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
+        #print ("[Debug] Failed while Fetching ",url) # Debug Functionality
         pass
+    source=driver.page_source
+    # print ("[Debug] source value: ",driver.page_source) # Debug Functionality
+    if not ("not found" in source) and not (source=="") and not (source==default):
+        try:
+            driver.save_screenshot(sc_path+"/"+IP+"_"+port+".png")
+        except:
+            pass
+    driver.delete_all_cookies() # Clear Cookies
+    driver.get("about:blank")
 
 def validate(targ):
-    #print(IP)
     if not bool(re.match(pattern_v4,targ.address)):
         if bool(re.match(pattern_v6,targ.address)) == True:
             targ.ipv6 = True
@@ -162,6 +165,21 @@ def validate(targ):
             return False
     else:
         True
+
+# Capture SIGINT
+def sig_handler(signal, frame):
+    print("\n[!] SHUTTING DOWN HostHunter !!!")
+    try:
+        driver.close()
+        driver.quit()
+        signal.pause()
+    except:
+        pass
+    print("\n[!] Bye bye...\n")
+    sys.exit(0)
+
+# Signal Listener
+signal.signal(signal.SIGINT, sig_handler)
 
 # Main Function - Read IPs from <targets.txt> file
 def main(argc):
@@ -177,9 +195,6 @@ def main(argc):
         # Querying HackerTarget.com API
         try:
             http = urllib3.PoolManager()
-        #    r3 = http.request('GET', 'https://api.hackertarget.com/reverseiplookup/?q=%s' % ip,decode_content=True).read().decode("UTF-8")
-        #    print (r3)
-        #    r2 = urllib3.request.urlopen('https://api.hackertarget.com/reverseiplookup/?q=%s' % ip).read().decode("UTF-8")
             r2 = http.request('GET', 'https://api.hackertarget.com/reverseiplookup/?q=%s' % ip,decode_content=True).read().decode("UTF-8")
             if (r2.find("No DNS A records found")==-1) and (r2.find("API count exceeded")==-1 and r2.find("error")==-1):
                 for host in r2.split('\n'):
@@ -190,30 +205,27 @@ def main(argc):
             # Add API count exceed detection
             else:
                 pass
-        except (urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError) as e:
+        except (urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
             print ("[*] Error: connecting with HackerTarget.com API")
 
         # Querying Bing.com
         if args.bing == True:
             try:
-                http = urllib3.PoolManager()
-                #r3 = urllib3.request.urlopen('https://www.bing.com/search?q=ip%%3a%s' % ip).read().decode("UTF-8")
                 r3 = http.request('GET','https://www.bing.com/search?q=ip%%3a%s' % ip,decode_content=True)
                 response= r3.data.decode('utf-8')
                 bing_results = re.findall(pattern,response)
-                #print (bing_results)
+                #print ("[Debug] Bing.com Response: ",bing_results)
                 for item in bing_results:
                     url = re.findall("(http(s)?://[^\s]+)",item)[0][0]
                     item = re.sub("\"","",url)
                     hostx.apps.append(item)
                     host = re.sub("(http(s)?://)","",item)
                     host2 = re.sub("/(.)*","",host)
-                #    print (host);
                     if (host2=="") or (host2 in hostx.hname):
                         pass
                     else:
                         hostx.hname.append(host2)
-            except (urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError) as e:
+            except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
                 print ("[*] Error: connecting with Bing.com")
 
         # Capture Screenshots with -cs option
@@ -232,7 +244,7 @@ def main(argc):
                     pass
                 else:
                     hostx.hname.append(host)
-        except (requests.ConnectionError,requests.Timeout,socket.error,socket.timeout) as e:
+        except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
             pass
 
         if hostx.hname:
@@ -269,10 +281,11 @@ def main(argc):
     targets.close()
 
     if args.screen_capture == True:
-        driver.quit()
-    # IPV6 https://[%ip6]
-    #  Robtex
-    #  https://freeapi.robtex.com/pdns/reverse/$ip
+        try:
+            driver.close()
+            driver.quit()
+        except (urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
+            pass
 
     print ("\n" + "|" + "-" * 95 + "|", end = "\n\n")
     print ("  Reconnaissance Completed!", end = "\n\n")
@@ -286,10 +299,9 @@ def main(argc):
 if __name__ == "__main__":
     start_time = time.time() # Start Counter
     display_banner() # Banner
-
     if args.screen_capture == True:
         driver = webdriver.Chrome(executable_path=DRIVER,chrome_options=chrome_opt)
-        driver.set_page_load_timeout(10)
+        driver.set_page_load_timeout(12)
         if not os.path.exists(sc_path):
             os.makedirs(sc_path)
         print ("    Screenshots saved at: ",os.getcwd()+ "/" +sc_path)
