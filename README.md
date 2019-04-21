@@ -62,7 +62,7 @@ $ cat hosts.csv
 ## Notes
 * Free APIs throttle the amount of requests per day per source IP address..
 
-##License
+## License
 This project is licensed under the MIT License.
 
 ## Authors
