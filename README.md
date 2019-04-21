@@ -1,6 +1,7 @@
 HostHunter v1.5
 ======
 
+<<<<<<< HEAD
 A tool to efficiently discover and extract hostnames over a large set of target IP addresses. HostHunter utilises simple OSINT techniques. It generates a CSV file containing the results of the reconnaissance.
 
 Taking screenshots was also added as a beta functionality.
@@ -69,3 +70,8 @@ This project is licensed under the MIT License.
 
 ## Authors
 * **Andreas Georgiou** - find me on twitter - [@superhedgy](https://twitter.com/superhedgy)
+=======
+A tool to efficiently discover and extract hostnames over a large set of target IP addresses.
+
+## Soon to be released.
+>>>>>>> b701c0fe003642fc6dee58f0878f3d1e13dcdeef
