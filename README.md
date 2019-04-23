@@ -33,20 +33,49 @@ $ pip install -r requirements.txt
 
 ## Simple Usage Example
 ```bash
-$ python hosthunter.py <targets.txt>
+$ python3 hosthunter.py <targets.txt>
 ```
 
 ```bash
 $ cat vhosts.csv
 ```
 
-## Full Functionality Example
+## More Examples
+HostHunter Help Page
 ```bash
-$ python hosthunter.py <targets.txt> -o hosts.csv -f csv --bing -sc
-```
+$ python3 hosthunter.py -h
+usage: hosthunter.py [-h] [-V] [-f FORMAT] [-o OUTPUT] [-b] [-sc] targets
 
+|<--- HostHunter v1.5 - Help Page --->|
+
+positional arguments:
+  targets               Sets the path of the target IPs file.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -V, --version         Displays the currenct version.
+  -f FORMAT, --format FORMAT
+                        Choose between CSV and TXT output file formats.
+  -o OUTPUT, --output OUTPUT
+                        Sets the path of the output file.
+  -b, --bing            Use Bing.com search engine to discover more hostnames
+                        associated with the target IP addreses.
+  -sc, --screen-capture
+                        Capture a screen shot of any associated Web
+                        Applications.
+```                        
+
+Run HostHunter with Bing and Screen Captures modules
+```bash
+$ python3 hosthunter.py <targets.txt> -o hosts.csv -f csv --bing -sc
+```
+Display Results
 ```bash
 $ cat hosts.csv
+```
+View Screenshots
+```bash
+$ open ./screen_captures/
 ```
 
 ## Features
