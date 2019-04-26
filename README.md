@@ -1,4 +1,4 @@
-![Python Version]https://img.shields.io/static/v1.svg?label=Python&message=3.x&color=Blue)
+![Python Version](https://img.shields.io/static/v1.svg?label=Python&message=3.x&color=Blue)
 ![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?label=Follow&style=social)
 
 HostHunter v1.5
