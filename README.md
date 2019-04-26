@@ -1,3 +1,6 @@
+![Python Version]https://img.shields.io/static/v1.svg?label=Python&message=3.x&color=Blue)
+![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?label=Follow&style=social)
+
 HostHunter v1.5
 ======
 
@@ -65,9 +68,9 @@ optional arguments:
                         Applications.
 ```                        
 
-Run HostHunter with Bing and Screen Captures modules
+Run HostHunter with Bing and Screen Captures modules enabled
 ```bash
-$ python3 hosthunter.py <targets.txt> -o hosts.csv -f csv --bing -sc
+$ python3 hosthunter.py <targets.txt> --bing -sc -f csv -o hosts.csv
 ```
 Display Results
 ```bash
@@ -82,8 +85,8 @@ $ open ./screen_captures/
 [X] Works with Python3  
 [X] Scraps Bing.com results  
 [X] Supports .txt and .csv output file formats  
-[X] Validate target IPv4 addresses  
-[X] Takes Screenshots  
+[X] Validates target IPv4 addresses  
+[X] Takes Screenshots of the targets
 [X] Extracts hostnames from SSL certificates  
 [X] Utilises Hacker Target API  
 
@@ -91,7 +94,7 @@ $ open ./screen_captures/
 [\_] Support for HackerTarget API key
 
 ## Notes
-* Free APIs throttle the amount of requests per day per source IP address..
+* Free APIs throttle the amount of requests per day per source IP address.
 
 ## License
 This project is licensed under the MIT License.
