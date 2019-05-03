@@ -1,12 +1,12 @@
 ![Python Version](https://img.shields.io/static/v1.svg?label=Python&message=3.x&color=Blue)
-![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?label=Follow&style=social)
+![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?label=Follow&style=social "Follow Me!")(https://twitter.com/intent/follow?screen_name=superhedgy)
 
 HostHunter v1.5
 ======
 
-A tool to efficiently discover and extract hostnames over a large set of target IP addresses. HostHunter utilises simple OSINT techniques. It generates a CSV file containing the results of the reconnaissance.
+A tool to efficiently discover and extract hostnames providing a large set of target IP addresses. HostHunter utilises simple OSINT techniques to map IP addresses with virtual hostnames. It generates a CSV or TXT file containing the results of the reconnaissance.
 
-Taking screenshots was also added as a beta functionality.
+Latest version of HostHunter also takes screenshots of the targets, it is currently a beta functionality.
 
 ## Demo
 * Currently GitLab's markup language does not support HTML or CSS control over the images, thus the following link thumbnail is huge.
@@ -16,9 +16,22 @@ Taking screenshots was also added as a beta functionality.
 ## Installation
 * Tested with Python 3.7.2.
 
-### Linux
-* Use wget command to download a latest Google Chrome debian package.  
+### Linux / Mac OS
+* Install python dependencies.
+```bash
+$ pip3 install -r requirements.txt
+```
 
+The next few steps are only required if you would like to use the Screen Capture feature.
+* Use wget command to download the latest Google Chrome Debian package.
+
+Mac OS:
+```bash
+$ brew cask install google-chrome
+```
+or
+
+Linux:
 ```bash
 
 $ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -28,11 +41,17 @@ $ dpkg -i ./google-chrome-stable_current_amd64.deb
 $ sudo apt-get install -f
 ```
 
-* Install python dependencies.
+* Download and install ChromeDriver.
+Mac OS:
 ```bash
-$ pip install -r requirements.txt
+wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_mac64.zip && sudo unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/;
 ```
+or
 
+Linux:
+```bash
+wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_linux64.zip && sudo unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/;
+```
 
 ## Simple Usage Example
 ```bash
