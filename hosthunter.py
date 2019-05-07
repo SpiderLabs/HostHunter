@@ -71,12 +71,13 @@ description='|<--- HostHunter v1.5 - Help Page --->|',
 epilog="Author: " + __author__
 )
 
-parser.add_argument("-V","--version",help="Displays the currenct version.",action="store_true",default=False)
-parser.add_argument("targets",help="Sets the path of the target IPs file." , type=str, default="targets.txt")
+parser.add_argument("-b","--bing",help="Use Bing.com search engine to discover more hostnames associated with the target IP addreses.",action="store_true",default=False)
 parser.add_argument("-f","--format",help="Choose between CSV and TXT output file formats.", default="csv")
 parser.add_argument("-o","--output", help="Sets the path of the output file.", type=str,default="vhosts.csv")
-parser.add_argument("-b","--bing",help="Use Bing.com search engine to discover more hostnames associated with the target IP addreses.",action="store_true",default=False)
 parser.add_argument("-sc","--screen-capture",help="Capture a screen shot of any associated Web Applications.",action="store_true",default=False)
+parser.add_argument("-t","--target",help="Scan a Single IP.")
+parser.add_argument("targets",nargs='?',help="Sets the path of the target IPs file." , type=str, default="")
+parser.add_argument("-V","--version",help="Displays the currenct version.",action="store_true",default=False)
 args = parser.parse_args()
 
 if args.format.lower() != "txt" and args.format.lower() != "csv":
@@ -89,8 +90,12 @@ if args.version:
     print("Author:", __author__)
     exit()
 
+if args.target and args.targets:
+    print("\n[*] Error: Too many arguments! Either select single target or specify a list of targets.")
+    print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv")
+    exit()
 # Targets Input File
-if not os.path.exists(args.targets):
+if args.targets and not os.path.exists(args.targets):
     print("\n[*] Error: targets file",args.targets,"does not exist.\n")
     exit()
 
@@ -99,8 +104,12 @@ if os.path.exists(args.output):
     answer = input("Answer with [Y]es or [N]o : ").lower()
     if (answer == 'no' or answer == 'n'):
         exit()
-
-targets = open(args.targets,"rt") # Read File
+if args.target:
+    targets=[]
+    targets.append(args.target)
+    print (targets)
+else:
+    targets = open(args.targets,"rt") # Read File
 vhostsf = open(args.output, "wt") # Write File
 appsf = open("webapps.txt", "wt") # Write File
 
@@ -115,7 +124,7 @@ def display_banner():
         " | $$  | $$  /$$$$$$   /$$$$$$$ /$$$$$$  | $$  | $$ /$$   /$$ /$$$$$$$  /$$$$$$    /$$$$$$   /$$$$$$\n"
         " | $$$$$$$$ /$$__  $$ /$$_____/|_  $$_/  | $$$$$$$$| $$  | $$| $$__  $$|_  $$_/   /$$__  $$ /$$__  $$\n"
         " | $$__  $$| $$  \ $$|  $$$$$$   | $$    | $$__  $$| $$  | $$| $$  \ $$  | $$    | $$$$$$$$| $$  \__/\n"
-        " | $$  | $$| $$  | $$ \____  $$  | $$ /$$| $$  | $$| $$  | $$| $$  | $$  | $$ /$$| $$_____/| $$\n"
+        " | $$  | $$| $$__| $$ \____  $$  | $$ /$$| $$  | $$| $$__| $$| $$  | $$  | $$ /$$| $$_____/| $$\n"
         " | $$  | $$|  $$$$$$/ /$$$$$$$/  |  $$$$/| $$  | $$|  $$$$$$/| $$  | $$  |  $$$$/|  $$$$$$$| $$\n"
         " |__/  |__/ \______/ |_______/    \___/  |__/  |__/ \______/ |__/  |__/   \___/   \_______/|__/  " + __version__ + "\n"
     )
@@ -166,6 +175,28 @@ def validate(targ):
     else:
         True
 
+# BingIT
+def bingIT(hostx):
+    try:
+        http = urllib3.PoolManager()
+        r3 = http.request('GET','https://www.bing.com/search?q=ip%%3a%s' % hostx.address,decode_content=True)
+        response= r3.data.decode('utf-8')
+        bing_results = re.findall(pattern,response)
+        #print ("[Debug] Bing.com Response: ",bing_results)
+        for item in bing_results:
+            url = re.findall("(http(s)?://[^\s]+)",item)[0][0]
+            item = re.sub("\"","",url)
+            hostx.apps.append(item)
+            host = re.sub("(http(s)?://)","",item)
+            host2 = re.sub("/(.)*","",host)
+            if (host2=="") or (host2 in hostx.hname):
+                pass
+            else:
+                hostx.hname.append(host2)
+    except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
+        print ("[*] Error: connecting with Bing.com")
+
+
 # Capture SIGINT
 def sig_handler(signal, frame):
     print("\n[!] SHUTTING DOWN HostHunter !!!")
@@ -186,8 +217,7 @@ def main(argc):
     counter=0
 
     for ip in targets:
-        ip=ip.replace("\n","")
-        hostx = target(ip)
+        hostx = target(ip.replace("\n",""))
         if validate(hostx) == False:
             continue
 
@@ -195,7 +225,7 @@ def main(argc):
         # Querying HackerTarget.com API
         try:
             http = urllib3.PoolManager()
-            r2 = http.request('GET', 'https://api.hackertarget.com/reverseiplookup/?q=%s' % ip,decode_content=True).read().decode("UTF-8")
+            r2 = http.request('GET', 'https://api.hackertarget.com/reverseiplookup/?q=%s' % hostx.address,decode_content=True).read().decode("UTF-8")
             if (r2.find("No DNS A records found")==-1) and (r2.find("API count exceeded")==-1 and r2.find("error")==-1):
                 for host in r2.split('\n'):
                     if (host=="") or (host in hostx.hname):
@@ -210,23 +240,10 @@ def main(argc):
 
         # Querying Bing.com
         if args.bing == True:
-            try:
-                r3 = http.request('GET','https://www.bing.com/search?q=ip%%3a%s' % ip,decode_content=True)
-                response= r3.data.decode('utf-8')
-                bing_results = re.findall(pattern,response)
-                #print ("[Debug] Bing.com Response: ",bing_results)
-                for item in bing_results:
-                    url = re.findall("(http(s)?://[^\s]+)",item)[0][0]
-                    item = re.sub("\"","",url)
-                    hostx.apps.append(item)
-                    host = re.sub("(http(s)?://)","",item)
-                    host2 = re.sub("/(.)*","",host)
-                    if (host2=="") or (host2 in hostx.hname):
-                        pass
-                    else:
-                        hostx.hname.append(host2)
-            except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
-                print ("[*] Error: connecting with Bing.com")
+            bingIT(hostx)
+            print("erros")
+
+        print("test")
 
         # Capture Screenshots with -cs option
         if args.screen_capture == True:
@@ -235,7 +252,7 @@ def main(argc):
             take_screenshot(ip,"8080")
         # Fetch SSL Certificates
         try:
-            cert=ssl.get_server_certificate((ip, 443))
+            cert=ssl.get_server_certificate((hostx.address, 443))
             x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
             cert_hostname=x509.get_subject().CN
             # Add New HostNames to List
@@ -278,7 +295,8 @@ def main(argc):
 
         # END FOR LOOP
     # END IF
-    targets.close()
+    if args.targets:
+        targets.close()
 
     if args.screen_capture == True:
         try:
@@ -300,7 +318,7 @@ if __name__ == "__main__":
     start_time = time.time() # Start Counter
     display_banner() # Banner
     if args.screen_capture == True:
-        driver = webdriver.Chrome(executable_path=DRIVER,chrome_options=chrome_opt)
+        driver = webdriver.Chrome(executable_path=DRIVER,options=chrome_opt)
         driver.set_page_load_timeout(12)
         if not os.path.exists(sc_path):
             os.makedirs(sc_path)
