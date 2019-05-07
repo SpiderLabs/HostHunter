@@ -42,6 +42,7 @@ $ sudo apt-get install -f
 ```
 
 * Download and install ChromeDriver.
+
 Mac OS:
 ```bash
 wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_mac64.zip && sudo unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/;
@@ -66,7 +67,8 @@ $ cat vhosts.csv
 HostHunter Help Page
 ```bash
 $ python3 hosthunter.py -h
-usage: hosthunter.py [-h] [-V] [-f FORMAT] [-o OUTPUT] [-b] [-sc] targets
+usage: hosthunter.py [-h] [-b] [-f FORMAT] [-o OUTPUT] [-sc] [-t TARGET] [-V]
+                     [targets]
 
 |<--- HostHunter v1.5 - Help Page --->|
 
@@ -75,16 +77,19 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -V, --version         Displays the currenct version.
+  -b, --bing            Use Bing.com search engine to discover more hostnames
+                        associated with the target IP addreses.
   -f FORMAT, --format FORMAT
                         Choose between CSV and TXT output file formats.
   -o OUTPUT, --output OUTPUT
                         Sets the path of the output file.
-  -b, --bing            Use Bing.com search engine to discover more hostnames
-                        associated with the target IP addreses.
   -sc, --screen-capture
                         Capture a screen shot of any associated Web
                         Applications.
+  -t TARGET, --target TARGET
+                        Scan a Single IP.
+  -V, --version         Displays the currenct version.
+
 ```                        
 
 Run HostHunter with Bing and Screen Captures modules enabled
@@ -103,9 +108,9 @@ $ open ./screen_captures/
 ## Features
 [X] Works with Python3  
 [X] Scraps Bing.com results  
-[X] Supports .txt and .csv output file formats  
+[X] Supports .txt and .csv output file formats
 [X] Validates target IPv4 addresses  
-[X] Takes Screenshots of the targets
+[X] Takes Screenshots of the targets  
 [X] Extracts hostnames from SSL certificates  
 [X] Utilises Hacker Target API  
 
