@@ -1,5 +1,5 @@
 ![Python Version](https://img.shields.io/static/v1.svg?label=Python&message=3.x&color=Blue)
-![MIT License](https://img.shields.io/badge/License-MIT-Red.svg)
+![GitHub](https://img.shields.io/github/license/spiderlabs/hosthunter.svg)
 ![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?style=social)
 
 HostHunter v1.5
