@@ -116,10 +116,10 @@ $ open ./screen_captures/
 [X] Supports .txt and .csv output file formats  
 
 ## Coming Next
-[\_] Support for HackerTarget API key
-[\_] Support for IPv6
-[\_] Gather information from additional APIs
-[\_] Actively pull SSL certificates from other TCP ports
+[\_] Support for HackerTarget API key  
+[\_] Support for IPv6  
+[\_] Gather information from additional APIs  
+[\_] Actively pull SSL certificates from other TCP ports  
 
 ## Notes
 * Free APIs throttle the amount of requests per day per source IP address.
