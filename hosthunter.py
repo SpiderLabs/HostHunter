@@ -241,9 +241,6 @@ def main(argc):
         # Querying Bing.com
         if args.bing == True:
             bingIT(hostx)
-            print("erros")
-
-        print("test")
 
         # Capture Screenshots with -cs option
         if args.screen_capture == True:
