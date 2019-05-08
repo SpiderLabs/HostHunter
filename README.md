@@ -109,7 +109,7 @@ $ open ./screen_captures/
 ## Features
 [X] Works with Python3  
 [X] Extracts and analyses hostnames from SSL certificates  
-[X] Utilises Hacker Target API
+[X] Utilises Hacker Target API  
 [X] Scraps Bing.com results  
 [X] Takes Screenshots of the targets  
 [X] Validates target IPv4 addresses  
