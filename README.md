@@ -93,7 +93,7 @@ optional arguments:
 
 ```                        
 
-Run HostHunter with Bing and Screen Captures modules enabled
+Run HostHunter with Bing and Screen Capture modules enabled
 ```bash
 $ python3 hosthunter.py <targets.txt> --bing -sc -f csv -o hosts.csv
 ```
@@ -109,7 +109,7 @@ $ open ./screen_captures/
 ## Features
 [X] Works with Python3  
 [X] Scraps Bing.com results  
-[X] Supports .txt and .csv output file formats
+[X] Supports .txt and .csv output file formats  
 [X] Validates target IPv4 addresses  
 [X] Takes Screenshots of the targets  
 [X] Extracts hostnames from SSL certificates  
