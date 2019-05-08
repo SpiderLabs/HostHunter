@@ -108,15 +108,18 @@ $ open ./screen_captures/
 
 ## Features
 [X] Works with Python3  
+[X] Extracts and analyses hostnames from SSL certificates  
+[X] Utilises Hacker Target API
 [X] Scraps Bing.com results  
-[X] Supports .txt and .csv output file formats  
-[X] Validates target IPv4 addresses  
 [X] Takes Screenshots of the targets  
-[X] Extracts hostnames from SSL certificates  
-[X] Utilises Hacker Target API  
+[X] Validates target IPv4 addresses  
+[X] Supports .txt and .csv output file formats  
 
 ## Coming Next
 [\_] Support for HackerTarget API key
+[\_] Support for IPv6
+[\_] Gather information from additional APIs
+[\_] Actively pull SSL certificates from other TCP ports
 
 ## Notes
 * Free APIs throttle the amount of requests per day per source IP address.
