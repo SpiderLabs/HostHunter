@@ -255,7 +255,7 @@ def main(argc):
             continue
 
         print ("\n[+] Target: %s" % hostx.address)
-
+        
         # Fetch SSL Certificates
         sslGrabber(hostx,443)
         # Querying HackerTarget.com API
