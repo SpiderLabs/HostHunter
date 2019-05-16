@@ -1,6 +1,6 @@
 ![Python Version](https://img.shields.io/static/v1.svg?label=Python&message=3.x&color=Blue)
-![GitHub](https://img.shields.io/github/license/spiderlabs/hosthunter.svg)
-![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?style=social)
+[![License](https://img.shields.io/github/license/spiderlabs/hosthunter.svg)](https://github.com/SpiderLabs/HostHunter/blob/master/LICENSE)
+[![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?style=social)](https://twitter.com/superhedgy)
 
 HostHunter v1.5
 ======
@@ -24,15 +24,14 @@ $ pip3 install -r requirements.txt
 ```
 
 The next few steps are only required if you would like to use the Screen Capture feature.
-* Use wget command to download the latest Google Chrome Debian package.
 
-Mac OS:
+* Download and install the latest version of Google Chrome.
+
+**Mac OS:**
 ```bash
 $ brew cask install google-chrome
 ```
-or
-
-Linux:
+**Linux:**
 ```bash
 
 $ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -42,15 +41,13 @@ $ dpkg -i ./google-chrome-stable_current_amd64.deb
 $ sudo apt-get install -f
 ```
 
-* Download and install ChromeDriver.
+* Download and install the latest ChromeDriver.
 
-Mac OS:
+**Mac OS:**
 ```bash
 wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_mac64.zip && sudo unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/;
 ```
-or
-
-Linux:
+**Linux:**
 ```bash
 wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_linux64.zip && sudo unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/;
 ```
@@ -89,7 +86,7 @@ optional arguments:
                         Applications.
   -t TARGET, --target TARGET
                         Scan a Single IP.
-  -V, --version         Displays the currenct version.
+  -V, --version         Displays the current version.
 
 ```                        
 
@@ -129,3 +126,7 @@ This project is licensed under the MIT License.
 
 ## Authors
 * **Andreas Georgiou** - find me on twitter - [@superhedgy](https://twitter.com/superhedgy)
+
+## StarGazers
+Thank you for all the support & feedback!
+[![Stargazers](https://starcharts.herokuapp.com/SpiderLabs/HostHunter.svg)](https://starcharts.herokuapp.com/SpiderLabs/HostHunter)
