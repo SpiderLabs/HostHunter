@@ -25,9 +25,9 @@ import sys
 import os
 import ssl
 import socket
-import time
 import re
 import signal
+from time import time,sleep
 # External Libraries
 import OpenSSL
 import urllib3
@@ -66,11 +66,7 @@ pattern=re.compile(regx)
 socket.setdefaulttimeout(3)
 
 ## Argument Parser
-parser = argparse.ArgumentParser(
-description='|<--- HostHunter v1.5 - Help Page --->|',
-epilog="Author: " + __author__
-)
-
+parser = argparse.ArgumentParser(description='|<--- HostHunter v1.5 - Help Page --->|',epilog="Author: " + __author__)
 parser.add_argument("-b","--bing",help="Use Bing.com search engine to discover more hostnames associated with the target IP addreses.",action="store_true",default=False)
 parser.add_argument("-f","--format",help="Choose between CSV and TXT output file formats.", default="csv")
 parser.add_argument("-o","--output", help="Sets the path of the output file.", type=str,default="vhosts.csv")
@@ -80,42 +76,44 @@ parser.add_argument("targets",nargs='?',help="Sets the path of the target IPs fi
 parser.add_argument("-V","--version",help="Displays the currenct version.",action="store_true",default=False)
 args = parser.parse_args()
 
-if args.format.lower() != "txt" and args.format.lower() != "csv":
-    print ("\nUnrecognised file format argument. Choose between 'txt' or 'csv' output file formats.\n")
-    print("Example Usage: python3 hosthunter.py targets.txt -f txt ")
-    exit()
 
-if args.version:
-    print("HostHunter version",__version__)
-    print("Author:", __author__)
-    exit()
-
-if args.target and args.targets:
-    print("\n[*] Error: Too many arguments! Either select single target or specify a list of targets.")
-    print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv")
-    exit()
-# Targets Input File
-if args.targets and not os.path.exists(args.targets):
-    print("\n[*] Error: targets file",args.targets,"does not exist.\n")
-    exit()
-
-if os.path.exists(args.output):
-    print("\n[?] {} file already exists, would you like to overwrite it?".format(args.output))
-    answer = input("Answer with [Y]es or [N]o : ").lower()
-    if (answer == 'no' or answer == 'n'):
+def init_checks(args):
+    if args.format.lower() != "txt" and args.format.lower() != "csv":
+        print ("\nUnrecognised file format argument. Choose between 'txt' or 'csv' output file formats.\n")
+        print("Example Usage: python3 hosthunter.py targets.txt -f txt ")
         exit()
+
+    if args.version:
+        print("HostHunter version",__version__)
+        print("Author:", __author__)
+        exit()
+
+    if args.target and args.targets:
+        print("\n[*] Error: Too many arguments! Either select single target or specify a list of targets.")
+        print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv")
+        exit()
+    # Targets Input File
+    if args.targets and not os.path.exists(args.targets):
+        print("\n[*] Error: targets file",args.targets,"does not exist.\n")
+        exit()
+
+    if os.path.exists(args.output):
+        print("\n[?] {} file already exists, would you like to overwrite it?".format(args.output))
+        answer = input("Answer with [Y]es or [N]o : ").lower()
+        if (answer == 'no' or answer == 'n'):
+            exit()
+
+    if args.format.lower() == "csv":
+        vhostsf.write("\"" + "IP Address" + "\",\"" + "Port/Protocol" + "\",\"" + "Domains" +  "\",\""
+        + "Operating System" + "\",\"" + "OS Version" + "\",\"" + "Notes" +  "\"\n") #vhosts.csv Header
+
 if args.target:
     targets=[]
     targets.append(args.target)
-    print (targets)
 else:
     targets = open(args.targets,"rt") # Read File
 vhostsf = open(args.output, "wt") # Write File
 appsf = open("webapps.txt", "wt") # Write File
-
-if args.format.lower() == "csv":
-    vhostsf.write("\"" + "IP Address" + "\",\"" + "Port/Protocol" + "\",\"" + "Domains" +  "\",\""
-    + "Operating System" + "\",\"" + "OS Version" + "\",\"" + "Notes" +  "\"\n") #vhosts.csv Header
 
 def display_banner():
     banner=(
@@ -144,16 +142,18 @@ class target:
 
 def take_screenshot(IP,port):
     source=default='<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body></html>'
-    time.sleep(0.5) # Delay
+    sleep(0.5) # Delay
+
     if port == "443":
         url="https://" + IP
     else:
-        url="http://" + IP+":"+port
-    # print ("[Debug] Navigating to: ",url) # Debug Functionality
+        url="http://" + IP + ':' + port
+        print ("[Debug] Navigating to: ",url) # Debug Functionality
     try:
         driver.get(url)
-    except (urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
-        #print ("[Debug] Failed while Fetching ",url) # Debug Functionality
+    #except (urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
+    except:
+        print ("[Debug] Failed while Fetching ",url) # Debug Functionality
         pass
     source=driver.page_source
     # print ("[Debug] source value: ",driver.page_source) # Debug Functionality
@@ -162,8 +162,9 @@ def take_screenshot(IP,port):
             driver.save_screenshot(sc_path+"/"+IP+"_"+port+".png")
         except:
             pass
-    driver.delete_all_cookies() # Clear Cookies
-    driver.get("about:blank")
+        finally:
+            driver.delete_all_cookies() # Clear Cookies
+            driver.get("about:blank")
 
 def validate(targ):
     if not bool(re.match(pattern_v4,targ.address)):
@@ -193,8 +194,47 @@ def bingIT(hostx):
                 pass
             else:
                 hostx.hname.append(host2)
-    except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
+    except:
+    #except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
         print ("[*] Error: connecting with Bing.com")
+    finally:
+        http.clear()
+
+# sslGrabber Function
+def sslGrabber(hostx,port):
+    try:
+        cert=ssl.get_server_certificate((hostx.address, port))
+        x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
+        cert_hostname=x509.get_subject().CN
+        # Add New HostNames to List
+        for host in cert_hostname.split('\n'):
+            if (host=="") or (host in hostx.hname):
+                pass
+            else:
+                hostx.hname.append(host)
+    except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
+        pass
+
+# queryAPI Function
+def queryAPI(url,hostx):
+    try:
+        http = urllib3.PoolManager()
+        r2 = http.request('GET', url % hostx.address,decode_content=True).read().decode("UTF-8")
+        if (r2.find("No DNS A records found")==-1) and (r2.find("API count exceeded")==-1 and r2.find("error")==-1):
+            for host in r2.split('\n'):
+                if (host=="") or (host in hostx.hname):
+                    pass
+                else:
+                    hostx.hname.append(host)
+        # Add API count exceed detection
+        else:
+            pass
+    except (requests.exceptions.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
+        print ("[*] Error: connecting with HackerTarget.com API")
+    finally:
+        sleep(0.5)
+        http.clear()
+
 
 
 # Capture SIGINT
@@ -209,9 +249,6 @@ def sig_handler(signal, frame):
     print("\n[!] Bye bye...\n")
     sys.exit(0)
 
-# Signal Listener
-signal.signal(signal.SIGINT, sig_handler)
-
 # Main Function - Read IPs from <targets.txt> file
 def main(argc):
     counter=0
@@ -222,21 +259,12 @@ def main(argc):
             continue
 
         print ("\n[+] Target: %s" % hostx.address)
+
+        # Fetch SSL Certificates
+        sslGrabber(hostx,443)
+
         # Querying HackerTarget.com API
-        try:
-            http = urllib3.PoolManager()
-            r2 = http.request('GET', 'https://api.hackertarget.com/reverseiplookup/?q=%s' % hostx.address,decode_content=True).read().decode("UTF-8")
-            if (r2.find("No DNS A records found")==-1) and (r2.find("API count exceeded")==-1 and r2.find("error")==-1):
-                for host in r2.split('\n'):
-                    if (host=="") or (host in hostx.hname):
-                        pass
-                    else:
-                        hostx.hname.append(host)
-            # Add API count exceed detection
-            else:
-                pass
-        except (urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
-            print ("[*] Error: connecting with HackerTarget.com API")
+        queryAPI("https://api.hackertarget.com/reverseiplookup/?q=%s",hostx)
 
         # Querying Bing.com
         if args.bing == True:
@@ -244,22 +272,9 @@ def main(argc):
 
         # Capture Screenshots with -cs option
         if args.screen_capture == True:
-            take_screenshot(ip,"80")
-            take_screenshot(ip,"443")
-            take_screenshot(ip,"8080")
-        # Fetch SSL Certificates
-        try:
-            cert=ssl.get_server_certificate((hostx.address, 443))
-            x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
-            cert_hostname=x509.get_subject().CN
-            # Add New HostNames to List
-            for host in cert_hostname.split('\n'):
-                if (host=="") or (host in hostx.hname):
-                    pass
-                else:
-                    hostx.hname.append(host)
-        except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
-            pass
+            take_screenshot(hostx.address,"80")
+            take_screenshot(hostx.address,"443")
+            take_screenshot(hostx.address,"8080")
 
         if hostx.hname:
             print ("[+] Hostnames: ", end = "\n")
@@ -273,12 +288,12 @@ def main(argc):
             # Write output to .CSV file
             if args.format.lower() == 'csv':
                 hostnames = ','.join(hostx.hname) # Merging the lists prooved Faster than list iterations
-                row = "\"" + ip + "\"," + "\"443/tcp\"" + "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
+                row = "\"" + hostx.address + "\"," + "\"443/tcp\"" + "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
                 vhostsf.write(row)
 
                 if (args.bing == True and hostx.apps):
                     apps = ','.join(hostx.apps)
-                    row = "\"" + hostx.address + "\"," + "\"443/tcp\"" + "," + "\"" + apps + "\"" + "\n"
+                    row = "\"" + hostx.address + "\"," + "\"" + apps + "\"" + "\n"
                     appsf.write(row)
 
         else:
@@ -299,21 +314,25 @@ def main(argc):
         try:
             driver.close()
             driver.quit()
-        except (urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
+        except (requests.exceptions.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
             pass
 
     print ("\n" + "|" + "-" * 95 + "|", end = "\n\n")
     print ("  Reconnaissance Completed!", end = "\n\n")
     if counter==0:
-        print ("  0 hostname was discovered in %s sec" % (round(time.time() - start_time,2)), end = "\n\n")
+        print ("  0 hostname was discovered in %s sec" % (round(time() - start_time,2)), end = "\n\n")
     else:
-        print ("  %s hostnames were discovered in %s sec" % (counter,round(time.time() - start_time,2)), end = "\n\n")
+        print ("  %s hostnames were discovered in %s sec" % (counter,round(time() - start_time,2)), end = "\n\n")
     print ("|" + "-" * 95 + "|")
 #End of Main Function
 
+# Main Module
 if __name__ == "__main__":
-    start_time = time.time() # Start Counter
+    signal.signal(signal.SIGINT, sig_handler) # Signal Listener
+    init_checks(args) # Input Argument Checks
+    start_time = time() # Start Counter
     display_banner() # Banner
+
     if args.screen_capture == True:
         driver = webdriver.Chrome(executable_path=DRIVER,options=chrome_opt)
         driver.set_page_load_timeout(12)
@@ -322,5 +341,5 @@ if __name__ == "__main__":
         print ("    Screenshots saved at: ",os.getcwd()+ "/" +sc_path)
         print ("|" + "-" * 95 + "|", end = "\n\n")
 
-    main(sys.argv)
+    main(sys.argv) # Main Function
 #EOF
