@@ -73,7 +73,7 @@ parser.add_argument("-o","--output", help="Sets the path of the output file.", t
 parser.add_argument("-sc","--screen-capture",help="Capture a screen shot of any associated Web Applications.",action="store_true",default=False)
 parser.add_argument("-t","--target",help="Scan a Single IP.")
 parser.add_argument("targets",nargs='?',help="Sets the path of the target IPs file." , type=str, default="")
-parser.add_argument("-V","--version",help="Displays the currenct version.",action="store_true",default=False)
+parser.add_argument("-V","--version",help="Displays the current version.",action="store_true",default=False)
 args = parser.parse_args()
 
 
@@ -218,8 +218,7 @@ def sslGrabber(hostx,port):
 # queryAPI Function
 def queryAPI(url,hostx):
     try:
-        http = urllib3.PoolManager()
-        r2 = http.request('GET', url % hostx.address,decode_content=True).read().decode("UTF-8")
+        r2 = requests.get(url+hostx.address).text
         if (r2.find("No DNS A records found")==-1) and (r2.find("API count exceeded")==-1 and r2.find("error")==-1):
             for host in r2.split('\n'):
                 if (host=="") or (host in hostx.hname):
@@ -233,9 +232,6 @@ def queryAPI(url,hostx):
         print ("[*] Error: connecting with HackerTarget.com API")
     finally:
         sleep(0.5)
-        http.clear()
-
-
 
 # Capture SIGINT
 def sig_handler(signal, frame):
@@ -262,9 +258,8 @@ def main(argc):
 
         # Fetch SSL Certificates
         sslGrabber(hostx,443)
-
         # Querying HackerTarget.com API
-        queryAPI("https://api.hackertarget.com/reverseiplookup/?q=%s",hostx)
+        queryAPI("https://api.hackertarget.com/reverseiplookup/?q=",hostx)
 
         # Querying Bing.com
         if args.bing == True:
