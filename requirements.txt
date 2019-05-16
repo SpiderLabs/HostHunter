@@ -1,4 +1,4 @@
-pyOpenSSL==18.0.0
+pyOpenSSL>=18.0.0
 requests==2.21.0
-selenium==3.14.1
-urllib3==1.25.2
+selenium>=3.14.1
+urllib3==1.24.3
