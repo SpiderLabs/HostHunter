@@ -148,12 +148,12 @@ def take_screenshot(IP,port):
         url="https://" + IP
     else:
         url="http://" + IP + ':' + port
-        print ("[Debug] Navigating to: ",url) # Debug Functionality
+    ##    print ("[Debug] Navigating to: ",url) # Debug Functionality
     try:
         driver.get(url)
     #except (urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
     except:
-        print ("[Debug] Failed while Fetching ",url) # Debug Functionality
+    ##    print ("[Debug] Failed while Fetching ",url) # Debug Functionality
         pass
     source=driver.page_source
     # print ("[Debug] source value: ",driver.page_source) # Debug Functionality
@@ -255,7 +255,7 @@ def main(argc):
             continue
 
         print ("\n[+] Target: %s" % hostx.address)
-        
+
         # Fetch SSL Certificates
         sslGrabber(hostx,443)
         # Querying HackerTarget.com API
