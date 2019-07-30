@@ -207,11 +207,12 @@ def sslGrabber(hostx,port):
         x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
         cert_hostname=x509.get_subject().CN
         # Add New HostNames to List
-        for host in cert_hostname.split('\n'):
-            if (host=="") or (host in hostx.hname):
-                pass
-            else:
-                hostx.hname.append(host)
+        if cert_hostname is not None:
+            for host in cert_hostname.split('\n'):
+                if (host=="") or (host in hostx.hname):
+                    pass
+                else:
+                    hostx.hname.append(host)
     except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
         pass
 
