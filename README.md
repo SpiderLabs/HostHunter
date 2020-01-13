@@ -12,9 +12,7 @@ A tool to efficiently discover and extract hostnames providing a large set of ta
 Latest version of HostHunter also takes screenshots of the targets, it is currently a beta functionality.
 
 ## Demo
-* Currently GitLab's markup language does not support HTML or CSS control over the images, thus the following link thumbnail is huge.
-
-[![asciicast](https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png)](https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt)
+<a href=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt><img src=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png alt=asciicast height=30% width=30%></a>
 
 ## Installation
 * Tested with Python 3.7.2.
