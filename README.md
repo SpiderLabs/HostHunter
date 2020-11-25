@@ -12,7 +12,9 @@ A tool to efficiently discover and extract hostnames providing a large set of ta
 Latest version of HostHunter also takes screenshots of the targets, it is currently a beta functionality.
 
 ## Demo
-<a href=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt><img src=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png alt=asciicast height=30% width=30%></a>
+<a href=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt><img src=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png alt=asciicast height=70% width=70%></a>
+
+Click on the thumbnail above to view the demo.
 
 ## Installation
 * Tested with Python 3.7.2.
