@@ -118,6 +118,7 @@ $ open ./screen_captures/
 [X] Finds hostnames in 80/TCP, 443/TCP and 21/TCP ports.
 
 ## Coming Next
+[\_] Support for Nessus target format.
 [\_] Improve output (IPs, HostNames, FQDNs)
 [\_] Pause and Resume Execution
 [\_] Support for a Premium HackerTarget API key  
