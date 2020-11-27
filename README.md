@@ -1,7 +1,8 @@
-![Python Version](https://img.shields.io/static/v1.svg?label=Python&message=3.x&color=Blue)
+[![Python Version](https://img.shields.io/static/v1.svg?label=Python&message=3.x&color=blue)]()
 [![GitHub release](https://img.shields.io/github/release/SpiderLabs/HostHunter.svg?color=orange&style=popout)](https://github.com/SpiderLabs/HostHunter/releases)
 [![License](https://img.shields.io/github/license/spiderlabs/hosthunter.svg)](https://github.com/SpiderLabs/HostHunter/blob/master/LICENSE)
-![Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/github/SpiderLabs/HostHunter.svg?color=red&style=popout)
+[![Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/github/SpiderLabs/HostHunter.svg?color=red&style=popout)]()
+[![Issues](https://img.shields.io/github/issues/SpiderLabs/HostHunter?style=popout)](https://github.com/SpiderLabs/HostHunter/issues)
 [![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?style=social)](https://twitter.com/superhedgy)
 
 HostHunter v1.5
