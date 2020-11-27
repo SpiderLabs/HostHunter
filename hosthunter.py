@@ -61,6 +61,7 @@ regx_v4 = "^(?:[0-9]{1,3}\.){3}[0-9]{1,3}"
 regx_v6 = "(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"
 pattern_v4 = re.compile(regx_v4)
 pattern_v6 = re.compile(regx_v6)
+pattern_url = re.compile(r"https?://(www\.)?|(/.*)?")
 pattern=re.compile(regx)
 # Hack to make things faster
 socket.setdefaulttimeout(3)
@@ -216,6 +217,25 @@ def sslGrabber(hostx,port):
     except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
         pass
 
+# analyze_header Function
+def analyze_header(header,hostx):
+    try:
+        r2 = requests.get("http://"+hostx.address,allow_redirects=False)
+        r2.close()
+        if (r2.status_code in range(300,400)):
+            try:
+                webapp=(r2.headers['Location'])
+                hostx.apps.append(webapp)
+                hn=pattern_url.sub('',webapp)
+
+                if hn not in hostx.hname:
+                    hostx.hname.append(hn)
+            except:
+                return
+    except:
+        return
+    print("test")
+
 # queryAPI Function
 def queryAPI(url,hostx):
     try:
@@ -259,6 +279,10 @@ def main(argc):
 
         # Fetch SSL Certificates
         sslGrabber(hostx,443)
+
+        # Check Port 80
+        analyze_header("Location",hostx)
+
         # Querying HackerTarget.com API
         queryAPI("https://api.hackertarget.com/reverseiplookup/?q=",hostx)
 
