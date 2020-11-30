@@ -63,6 +63,7 @@ pattern_v4 = re.compile(regx_v4)
 pattern_v6 = re.compile(regx_v6)
 pattern_url = re.compile(r"https?://(www\.)?|(/.*)?")
 pattern=re.compile(regx)
+
 # Hack to make things faster
 socket.setdefaulttimeout(3)
 
@@ -76,7 +77,6 @@ parser.add_argument("-t","--target",help="Scan a Single IP.")
 parser.add_argument("targets",nargs='?',help="Sets the path of the target IPs file." , type=str, default="")
 parser.add_argument("-V","--version",help="Displays the current version.",action="store_true",default=False)
 args = parser.parse_args()
-
 
 def init_checks(args):
     if args.format.lower() != "txt" and args.format.lower() != "csv":
@@ -103,18 +103,16 @@ def init_checks(args):
         answer = input("Answer with [Y]es or [N]o : ").lower()
         if (answer == 'no' or answer == 'n'):
             exit()
+        else:
+            pass
 
-    if args.format.lower() == "csv":
-        vhostsf.write("\"" + "IP Address" + "\",\"" + "Port/Protocol" + "\",\"" + "Domains" +  "\",\""
-        + "Operating System" + "\",\"" + "OS Version" + "\",\"" + "Notes" +  "\"\n") #vhosts.csv Header
 
 if args.target:
     targets=[]
     targets.append(args.target)
 else:
     targets = open(args.targets,"rt") # Read File
-vhostsf = open(args.output, "wt") # Write File
-appsf = open("webapps.txt", "wt") # Write File
+
 
 def display_banner():
     banner=(
@@ -140,6 +138,16 @@ class target:
         self.hname = []
         self.apps = []
         self.ipv6 = False
+
+def nessus(hostx):
+    nessus = open(args.output + "_"+ "nessus", 'a')
+    for host in hostx.hname:
+        row = host + "[" + hostx.address + "]"
+        nessus.write(row)
+    if not hostx.hname:
+        nessus.write(hostx.address)
+    nessus.close()
+    return 0
 
 def take_screenshot(IP,port):
     source=default='<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body></html>'
@@ -213,7 +221,10 @@ def sslGrabber(hostx,port):
                 if (host=="") or (host in hostx.hname):
                     pass
                 else:
-                    hostx.hname.append(host)
+                    try:
+                        host=host.replace('*.','')
+                    finally:
+                        hostx.hname.append(host)
     except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
         pass
 
@@ -234,7 +245,6 @@ def analyze_header(header,hostx):
                 return
     except:
         return
-    print("test")
 
 # queryAPI Function
 def queryAPI(url,hostx):
@@ -298,6 +308,8 @@ def main(argc):
 
         if hostx.hname:
             print ("[+] Hostnames: ", end = "\n")
+            nessus(hostx)
+
             for item in hostx.hname:
                 print (item)
                 # Write output to .TXT file
@@ -352,6 +364,14 @@ if __name__ == "__main__":
     init_checks(args) # Input Argument Checks
     start_time = time() # Start Counter
     display_banner() # Banner
+
+    # Files
+    appsf = open(args.output+"_webapps.txt", "wt") # Write File
+    vhostsf = open(args.output+"_hosts.csv", "wt")
+
+    if args.format.lower() == "csv":
+        vhostsf.write("\"" + "IP Address" + "\",\"" + "Port/Protocol" + "\",\"" + "Domains" +  "\",\""
+        + "Operating System" + "\",\"" + "OS Version" + "\",\"" + "Notes" +  "\"\n") #vhosts.csv Header
 
     if args.screen_capture == True:
         driver = webdriver.Chrome(executable_path=DRIVER,options=chrome_opt)
