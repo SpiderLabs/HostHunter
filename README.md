@@ -107,15 +107,21 @@ $ open ./screen_captures/
 
 ## Features
 [X] Works with Python3  
-[X] Extracts and analyses hostnames from SSL certificates  
-[X] Utilises Hacker Target API  
-[X] Scraps Bing.com results  
-[X] Takes Screenshots of the targets  
-[X] Validates target IPv4 addresses  
+[X] Extracts information from SSL/TLS certificates.  
+[X] Supports Free HackerTarget API requests.  
+[X] Scraps Bing.com results.  
+[X] Takes Screenshots of the target applications.  
+[X] Validates the targets IPv4 address.  
 [X] Supports .txt and .csv output file formats  
+[X] Gathers information from HTTP headers.
+[X] Verifies Internet access.
+[X] Finds hostnames in 80/TCP, 443/TCP and 21/TCP ports.
 
 ## Coming Next
-[\_] Support for HackerTarget API key  
+[\_] Support for Nessus target format.  
+[\_] Improve output (IPs, HostNames, FQDNs)  
+[\_] Pause and Resume Execution  
+[\_] Support for a Premium HackerTarget API key  
 [\_] Support for IPv6  
 [\_] Gather information from additional APIs  
 [\_] Actively pull SSL certificates from other TCP ports  
@@ -127,7 +133,7 @@ $ open ./screen_captures/
 This project is licensed under the MIT License.
 
 ## Authors
-* **Andreas Georgiou** - find me on twitter - [@superhedgy](https://twitter.com/superhedgy)
+* **Andreas Georgiou** - follow me on twitter - [@superhedgy](https://twitter.com/superhedgy)
 
 ## StarGazers
 Thank you for all the support & feedback!
