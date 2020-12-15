@@ -69,7 +69,7 @@ socket.setdefaulttimeout(3)
 
 ## Argument Parser
 parser = argparse.ArgumentParser(description='|<--- HostHunter v1.5 - Help Page --->|',epilog="Author: " + __author__)
-parser.add_argument("-b","--bing",help="Use Bing.com search engine to discover more hostnames associated with the target IP addreses.",action="store_true",default=False)
+parser.add_argument("-b","--bing",help="Use Bing.com search engine to discover more hostnames associated with the target IP addresses.",action="store_true",default=False)
 parser.add_argument("-f","--format",help="Choose between CSV and TXT output file formats.", default="csv")
 parser.add_argument("-o","--output", help="Sets the path of the output file.", type=str,default="vhosts.csv")
 parser.add_argument("-sc","--screen-capture",help="Capture a screen shot of any associated Web Applications.",action="store_true",default=False)

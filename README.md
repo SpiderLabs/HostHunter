@@ -78,7 +78,7 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -b, --bing            Use Bing.com search engine to discover more hostnames
-                        associated with the target IP addreses.
+                        associated with the target IP addresses.
   -f FORMAT, --format FORMAT
                         Choose between CSV and TXT output file formats.
   -o OUTPUT, --output OUTPUT
