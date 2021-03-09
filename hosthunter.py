@@ -142,7 +142,7 @@ class target:
 def nessus(hostx):
     nessus = open(args.output + "_"+ "nessus", 'a')
     for host in hostx.hname:
-        row = host + "[" + hostx.address + "]"
+        row = host + "[" + hostx.address + "], "
         nessus.write(row)
     if not hostx.hname:
         nessus.write(hostx.address)
