@@ -109,7 +109,7 @@ $ open ./screen_captures/
 [X] Works with Python3  
 [X] Extracts information from SSL/TLS certificates.  
 [X] Supports Free HackerTarget API requests.  
-[X] Scraps Bing.com results.  
+~~[X] Scraps Bing.com results.  	~~.  
 [X] Takes Screenshots of the target applications.  
 [X] Validates the targets IPv4 address.  
 [X] Supports .txt and .csv output file formats  
@@ -120,9 +120,9 @@ $ open ./screen_captures/
 ## Coming Next
 [\_] Support for Nessus target format.  
 [\_] Improve output (IPs, HostNames, FQDNs)  
-[\_] Pause and Resume Execution  
-[\_] Support for a Premium HackerTarget API key  
-[\_] Support for IPv6  
+[\_] Pause and Resume Execution   
+[\_] Support for a Premium HackerTarget API key   
+[\_] Support for IPv6   
 [\_] Gather information from additional APIs  
 [\_] Actively pull SSL certificates from other TCP ports  
 
