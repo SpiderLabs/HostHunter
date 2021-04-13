@@ -109,7 +109,6 @@ $ open ./screen_captures/
 [X] Works with Python3  
 [X] Extracts information from SSL/TLS certificates.  
 [X] Supports Free HackerTarget API requests.  
-~~[X] Scraps Bing.com results.  	~~.  
 [X] Takes Screenshots of the target applications.  
 [X] Validates the targets IPv4 address.  
 [X] Supports .txt and .csv output file formats  
