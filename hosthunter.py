@@ -274,6 +274,14 @@ def sslGrabber(hostx, port):
         x509 = OpenSSL.crypto.load_certificate(
             OpenSSL.crypto.FILETYPE_PEM, cert)
         cert_hostname = x509.get_subject().CN
+        # Get SAN
+        alt_names = []
+        for i in range(0, x509.get_extension_count()):
+            ext = x509.get_extension(i)
+            if "subjectAltName" in str(ext.get_short_name()):
+                content = ext.__str__()
+                for alt_name in content.split(","):
+                    alt_names.append(alt_name.strip()[4:])
         # Add New HostNames to List
         if cert_hostname is not None:
             for host in cert_hostname.split('\n'):
@@ -284,6 +292,8 @@ def sslGrabber(hostx, port):
                         host = host.replace('*.', '')
                     finally:
                         hostx.hname.append(host)
+        for alt_name in alt_names:
+            hostx.hname.append(alt_name)
     except (urllib3.exceptions.ReadTimeoutError, requests.ConnectionError, urllib3.connection.ConnectionError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.TimeoutError, socket.error, socket.timeout) as e:
         pass
 
