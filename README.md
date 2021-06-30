@@ -114,10 +114,10 @@ $ open ./screen_captures/
 - [x] Supports .txt and .csv output file formats  
 - [x] Gathers information from HTTP headers.
 - [x] Verifies Internet access.
-- [x] Finds hostnames in 80/TCP, 443/TCP and 21/TCP ports.
+- [x] Retrieves hostname values from services at 21/tcp, 25/tcp, 80/tcp and 443/tcp ports.
+- [ ] Supports Nessus target format output.  
 
 ## Coming Next
-- [ ] Support for Nessus target format.  
 - [ ] Improve output (IPs, HostNames, FQDNs)  
 - [ ] Pause and Resume Execution   
 - [ ] Support for a Premium HackerTarget API key   
