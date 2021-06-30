@@ -115,7 +115,7 @@ $ open ./screen_captures/
 - [x] Gathers information from HTTP headers.
 - [x] Verifies Internet access.
 - [x] Retrieves hostname values from services at 21/tcp, 25/tcp, 80/tcp and 443/tcp ports.
-- [ ] Supports Nessus target format output.  
+- [x] Supports Nessus target format output.  
 
 ## Coming Next
 - [ ] Improve output (IPs, HostNames, FQDNs)  
