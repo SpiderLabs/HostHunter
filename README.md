@@ -106,24 +106,24 @@ $ open ./screen_captures/
 ```
 
 ## Features
-[X] Works with Python3  
-[X] Extracts information from SSL/TLS certificates.  
-[X] Supports Free HackerTarget API requests.  
-[X] Takes Screenshots of the target applications.  
-[X] Validates the targets IPv4 address.  
-[X] Supports .txt and .csv output file formats  
-[X] Gathers information from HTTP headers.
-[X] Verifies Internet access.
-[X] Finds hostnames in 80/TCP, 443/TCP and 21/TCP ports.
+- [x] Works with Python3  
+- [x] Extracts information from SSL/TLS certificates.  
+- [x] Supports Free HackerTarget API requests.  
+- [x] Takes Screenshots of the target applications.  
+- [x] Validates the targets IPv4 address.  
+- [x] Supports .txt and .csv output file formats  
+- [x] Gathers information from HTTP headers.
+- [x] Verifies Internet access.
+- [x] Finds hostnames in 80/TCP, 443/TCP and 21/TCP ports.
 
 ## Coming Next
-[\_] Support for Nessus target format.  
-[\_] Improve output (IPs, HostNames, FQDNs)  
-[\_] Pause and Resume Execution   
-[\_] Support for a Premium HackerTarget API key   
-[\_] Support for IPv6   
-[\_] Gather information from additional APIs  
-[\_] Actively pull SSL certificates from other TCP ports  
+- [ ] Support for Nessus target format.  
+- [ ] Improve output (IPs, HostNames, FQDNs)  
+- [ ] Pause and Resume Execution   
+- [ ] Support for a Premium HackerTarget API key   
+- [ ] Support for IPv6   
+- [ ] Gather information from additional APIs  
+- [ ] Actively pull SSL certificates from other TCP ports  
 
 ## Notes
 * Free APIs throttle the amount of requests per day per source IP address.
