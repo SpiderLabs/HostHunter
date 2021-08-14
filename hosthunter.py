@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 #
-#    | $$  | $$                      | $$    | $$  | $$                      | $$
-#    | $$  | $$  /$$$$$$   /$$$$$$$ /$$$$$$  | $$  | $$ /$$   /$$ /$$$$$$$
-#    | $$$$$$$$ /$$__  $$ /$$_____/|_  $$_/  | $$$$$$$$| $$  | $$| $$__  $$|_  $$_/   /$$__  $$ /$$__  $$
-#    | $$__  $$| $$  \ $$|  $$$$$$   | $$    | $$__  $$| $$  | $$| $$  \ $$  | $$    | $$$$$$$$| $$  \__/
-#    | $$  | $$| $$  | $$ \____  $$  | $$ /$$| $$  | $$| $$  | $$| $$  | $$  | $$ /$$| $$_____/| $$
-#    | $$  | $$|  $$$$$$/ /$$$$$$$/  |  $$$$/| $$  | $$|  $$$$$$/| $$  | $$  |  $$$$/|  $$$$$$$| $$
-#    |__/  |__/ \______/ |_______/    \___/  |__/  |__/ \______/ |__/  |__/   \___/   \_______/|__/1
+# | $$  | $$                              | $$  | $$
+# | $$  | $$                      | $$    | $$  | $$                      | $$
+# | $$  | $$  /$$$$$$   /$$$$$$$ /$$$$$$  | $$  | $$ /$$   /$$ /$$$$$$$  /$$$$$$    /$$$$$$   /$$$$$$
+# | $$$$$$$$ /$$__  $$ /$$_____/|_  $$_/  | $$$$$$$$| $$  | $$| $$__  $$|_  $$_/   /$$__  $$ /$$__  $$
+# | $$__  $$| $$  \ $$|  $$$$$$   | $$    | $$__  $$| $$  | $$| $$  \ $$  | $$    | $$$$$$$$| $$  \__/
+# | $$  | $$| $$__| $$ \____  $$  | $$ /$$| $$  | $$| $$__| $$| $$  | $$  | $$ /$$| $$_____/| $$
+# | $$  | $$|  $$$$$$/ /$$$$$$$/  |  $$$$/| $$  | $$|  $$$$$$/| $$  | $$  |  $$$$/|  $$$$$$$| $$
+# |__/  |__/ \______/ |_______/    \___/  |__/  |__/ \______/ |__/  |__/   \___/   \_______/|__/  v1.5
 #
 # Author  : Andreas Georgiou (superhedgy)
 # Email   : ageorgiou@trustwave.com
@@ -113,8 +114,13 @@ args = parser.parse_args()
 
 
 def init_checks(args):
+    if len(sys.argv) < 3:
+        print("[*] Error: No Arguments provided. ")
+        print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv")
+        exit()
+
     if args.format.lower() != "txt" and args.format.lower() != "csv":
-        print("\nUnrecognised file format argument. Choose between 'txt' or 'csv' output file formats.\n")
+        print("\n [*] Error: File output format not supported. Choose between 'txt' or 'csv' .\n")
         print("Example Usage: python3 hosthunter.py targets.txt -f txt ")
         exit()
 
@@ -143,24 +149,24 @@ def init_checks(args):
         else:
             pass
 
-
-if args.target:
-    targets = []
-    targets.append(args.target)
-else:
-    targets = open(args.targets, "rt")  # Read File
-
+def read_targets():
+    if args.target:
+        targets = []
+        targets.append(args.target)
+    else:
+        targets = open(args.targets, "rt")  # Read File
+    return targets
 
 def display_banner():
     banner = (
-        "                                                                             \n"
+        "\n | $$  | $$                              | $$  | $$                                     \n"
         " | $$  | $$                      | $$    | $$  | $$                      | $$\n"
         " | $$  | $$  /$$$$$$   /$$$$$$$ /$$$$$$  | $$  | $$ /$$   /$$ /$$$$$$$  /$$$$$$    /$$$$$$   /$$$$$$\n"
         " | $$$$$$$$ /$$__  $$ /$$_____/|_  $$_/  | $$$$$$$$| $$  | $$| $$__  $$|_  $$_/   /$$__  $$ /$$__  $$\n"
-        r" | $$__  $$| $$  \ $$|  $$$$$$   | $$    | $$__  $$| $$  | $$| $$  \ $$  | $$    | $$$$$$$$| $$  \__/\n"
-        r" | $$  | $$| $$__| $$ \____  $$  | $$ /$$| $$  | $$| $$__| $$| $$  | $$  | $$ /$$| $$_____/| $$\n"
+        " | $$__  $$| $$  \ $$|  $$$$$$   | $$    | $$__  $$| $$  | $$| $$  \ $$  | $$    | $$$$$$$$| $$  \__/\n"
+        " | $$  | $$| $$__| $$ \____  $$  | $$ /$$| $$  | $$| $$__| $$| $$  | $$  | $$ /$$| $$_____/| $$\n"
         " | $$  | $$|  $$$$$$/ /$$$$$$$/  |  $$$$/| $$  | $$|  $$$$$$/| $$  | $$  |  $$$$/|  $$$$$$$| $$\n"
-        r" |__/  |__/ \______/ |_______/    \___/  |__/  |__/ \______/ |__/  |__/   \___/   \_______/|__/  " +
+        " |__/  |__/ \______/ |_______/    \___/  |__/  |__/ \______/ |__/  |__/   \___/   \_______/|__/  " +
         __version__ +
         "\n")
 
@@ -178,6 +184,7 @@ class target:
         self.apps = []
         self.ipv6 = False
 
+# Nessus Function  - Generates IP/Hostname pairs in Nessus tool format.
 
 def nessus(hostx):
     nessus = open(args.output + "_" + "nessus", 'a')
@@ -188,6 +195,8 @@ def nessus(hostx):
         nessus.write(hostx.address)
     nessus.close()
     return 0
+
+# take_screenshot (Beta) Function - Takes screenshots of target web applications.
 
 
 def take_screenshot(IP, port):
@@ -235,7 +244,8 @@ def validate(targ):
     else:
         True
 
-# BingIT
+# BingIT Fucntion - Retrieves a List of Web Applications
+# No Longer Functioning, needs to be replaced with another technique
 
 
 def bingIT(hostx):
@@ -360,7 +370,7 @@ def sig_handler(signal, frame):
 # Main Function - Read IPs from <targets.txt> file
 
 
-def main(argc):
+def main(argc, targets):
     counter = 0
 
     for ip in targets:
@@ -452,6 +462,7 @@ if __name__ == "__main__":
     init_checks(args)  # Input Argument Checks
     start_time = time()  # Start Counter
     display_banner()  # Banner
+    targets = read_targets()
 
     # Files
     appsf = open(args.output + "_webapps.txt", "wt")  # Write File
@@ -481,5 +492,5 @@ if __name__ == "__main__":
         print("    Screenshots saved at: ", os.getcwd() + "/" + sc_path)
         print("|" + "-" * 95 + "|", end="\n\n")
 
-    main(sys.argv)  # Main Function
+    main(sys.argv,targets)  # Main Function
 # EOF
