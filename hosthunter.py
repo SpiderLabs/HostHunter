@@ -12,7 +12,7 @@
 # Author  : Andreas Georgiou (superhedgy)
 # Email   : ageorgiou@trustwave.com
 # Twitter : @superhedgy
-# Version: v1.5
+# Version: v1.6
 #
 # [+] Simple Usage Example:
 #
@@ -44,7 +44,7 @@ ua = UserAgent()
 os.environ['http_proxy'] = ''
 
 # Constants
-__version__ = "v1.5"
+__version__ = "v1.6"
 __author__ = "Andreas Georgiou (superhedgy)"
 
 # Options
