@@ -9,20 +9,18 @@
 # | $$  | $$|  $$$$$$/ /$$$$$$$/  |  $$$$/| $$  | $$|  $$$$$$/| $$  | $$  |  $$$$/|  $$$$$$$| $$
 # |__/  |__/ \______/ |_______/    \___/  |__/  |__/ \______/ |__/  |__/   \___/   \_______/|__/  v1.5
 #
-# Author  : Andreas Georgiou (superhedgy)
+# Author  : Andreas Georgiou (@superhedgy)
 # Email   : ageorgiou@trustwave.com
 # Twitter : @superhedgy
 # Version: v1.6
 #
 # [+] Simple Usage Example:
 #
-#       $ python3 hosthunter.py <targets.txt>
+#       $ python3 hosthunter.py <target_ips.txt>
 #
 #       $ cat vhosts.csv
 
 # Standard Libraries
-from selenium.webdriver.chrome.options import Options
-from selenium import webdriver
 import argparse
 import sys
 import os
@@ -30,8 +28,11 @@ import ssl
 import socket
 import re
 import signal
+import platform
 from time import time, sleep
 # External Libraries
+from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
 import OpenSSL
 import urllib3
 import requests
@@ -45,14 +46,14 @@ os.environ['http_proxy'] = ''
 
 # Constants
 __version__ = "v1.6"
-__author__ = "Andreas Georgiou (superhedgy)"
+__author__ = "Andreas Georgiou (@superhedgy)"
 
 # Options
 chrome_opt = Options()
 chrome_opt.add_argument("--ignore-certificate-errors")
 chrome_opt.add_argument("--test-type")
 chrome_opt.add_argument("--headless")  # Comment out to Debug
-DRIVER = 'chromedriver'
+DRIVER = "" # Set Custom Chrome Driver Path
 sc_path = 'screen_captures'
 context = ssl.create_default_context()
 context.check_hostname = False
@@ -72,14 +73,8 @@ socket.setdefaulttimeout(3)
 
 # Argument Parser
 parser = argparse.ArgumentParser(
-    description='|<--- HostHunter v1.5 - Help Page --->|',
-    epilog="Author: " + __author__)
-parser.add_argument(
-    "-b",
-    "--bing",
-    help="Use Bing.com search engine to discover more hostnames associated with the target IP addresses.",
-    action="store_true",
-    default=False)
+    description='[?] HostHunter '+__version__ +' - Help Page',
+    epilog="Author: " + __author__ )
 parser.add_argument(
     "-f",
     "--format",
@@ -94,7 +89,7 @@ parser.add_argument(
 parser.add_argument(
     "-sc",
     "--screen-capture",
-    help="Capture a screen shot of any associated Web Applications.",
+    help="Capture a screenshot of any associated Web Applications.",
     action="store_true",
     default=False)
 parser.add_argument("-t", "--target", help="Scan a Single IP.")
@@ -114,7 +109,7 @@ args = parser.parse_args()
 
 
 def init_checks(args):
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 2:
         print("[*] Error: No Arguments provided. ")
         print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv")
         exit()
@@ -144,10 +139,10 @@ def init_checks(args):
             "\n[?] {} file already exists, would you like to overwrite it?".format(
                 args.output))
         answer = input("Answer with [Y]es or [N]o : ").lower()
-        if (answer == 'no' or answer == 'n'):
-            exit()
-        else:
+        if (answer == 'yes' or answer == 'y'):
             pass
+        else:
+            exit()
 
 def read_targets():
     if args.target:
@@ -173,9 +168,7 @@ def display_banner():
     print("%s" % banner)
     print("\n", "HostHunter: ", __version__)
     print(" Author : ", __author__)
-    print(" Twitter:  @superhedgy")
     print("\n" + "|" + "-" * 95 + "|", end="\n")
-
 
 class target:
     def __init__(self, address):
@@ -199,36 +192,29 @@ def nessus(hostx):
 # take_screenshot (Beta) Function - Takes screenshots of target web applications.
 
 
-def take_screenshot(IP, port):
+def take_screenshot(wpath, port):
     source = default = '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body></html>'
     sleep(0.5)  # Delay
 
-    if port == "443":
-        url = "https://" + IP
+    if port == "80":
+        url = "http://" + wpath
     else:
-        url = "http://" + IP + ':' + port
-    # print ("[Debug] Navigating to: ",url) # Debug Functionality
+        url = "https://" + wpath + ":" + port
+
     try:
         driver.get(url)
-    # except
-    # (urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout)
-    # as e:
     except BaseException:
         # print ("[Debug] Failed while Fetching ",url) # Debug Functionality
         pass
     source = driver.page_source
     # print ("[Debug] source value: ",driver.page_source) # Debug Functionality
-    if not (
-        "not found" in source) and not (
-        source == "") and not (
-            source == default):
-        try:
-            driver.save_screenshot(sc_path + "/" + IP + "_" + port + ".png")
-        except BaseException:
-            pass
-        finally:
-            driver.delete_all_cookies()  # Clear Cookies
-            driver.get("about:blank")
+    try:
+        driver.save_screenshot(sc_path + "/" + wpath + "_" + port + ".png")
+    except BaseException:
+        pass
+    finally:
+        driver.get('chrome://settings/clearBrowserData')
+        driver.delete_all_cookies()  # Clear Cookies
 
 
 def validate(targ):
@@ -243,37 +229,6 @@ def validate(targ):
             return False
     else:
         True
-
-# BingIT Fucntion - Retrieves a List of Web Applications
-# No Longer Functioning, needs to be replaced with another technique
-
-
-def bingIT(hostx):
-    try:
-        http = urllib3.PoolManager()
-        r3 = http.request(
-            'GET', 'https://www.bing.com/search?q=ip%%3a%s' %
-            hostx.address, decode_content=True)
-        response = r3.data.decode('utf-8')
-        bing_results = re.findall(pattern, response)
-        #print ("[Debug] Bing.com Response: ",bing_results)
-        for item in bing_results:
-            url = re.findall(r"(http(s)?://[^\s]+)", item)[0][0]
-            item = re.sub("\"", "", url)
-            hostx.apps.append(item)
-            host = re.sub("(http(s)?://)", "", item)
-            host2 = re.sub("/(.)*", "", host)
-            if (host2 == "") or (host2 in hostx.hname):
-                pass
-            else:
-                hostx.hname.append(host2)
-    except BaseException:
-        # except
-        # (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout)
-        # as e:
-        print("[*] Error: connecting with Bing.com")
-    finally:
-        http.clear()
 
 # sslGrabber Function
 
@@ -292,8 +247,9 @@ def sslGrabber(hostx, port):
                 content = ext.__str__()
                 for alt_name in content.split(","):
                     alt_names.append(alt_name.strip()[4:])
+
         # Add New HostNames to List
-        if cert_hostname is not None:
+        if cert_hostname:
             for host in cert_hostname.split('\n'):
                 if (host == "") or (host in hostx.hname):
                     pass
@@ -303,7 +259,8 @@ def sslGrabber(hostx, port):
                     finally:
                         hostx.hname.append(host)
         for alt_name in alt_names:
-            hostx.hname.append(alt_name)
+            if (alt_name not in hostx.hname):
+                hostx.hname.append(alt_name)
     except (urllib3.exceptions.ReadTimeoutError, requests.ConnectionError, urllib3.connection.ConnectionError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.TimeoutError, socket.error, socket.timeout) as e:
         pass
 
@@ -367,6 +324,18 @@ def sig_handler(signal, frame):
     print("\n[!] Bye bye...\n")
     sys.exit(0)
 
+# check_os - Verifies the underlying platform
+def check_os(driver):
+    osversion = platform.system()
+    if driver != "":
+        return driver # Custom Driver Path Detected
+    elif osversion == "Darwin":
+        return "./drivers/chromedriver_mac64"
+    elif osversion == "Windows":
+        return "./drivers/chromedriver_win32"
+    elif osversion == "Linux":
+        return "./drivers/chromedriver_linux64"
+
 # Main Function - Read IPs from <targets.txt> file
 
 
@@ -389,22 +358,20 @@ def main(argc, targets):
         # Querying HackerTarget.com API
         queryAPI("https://api.hackertarget.com/reverseiplookup/?q=", hostx)
 
-        # Querying Bing.com
-        if args.bing:
-            bingIT(hostx)
-
-        # Capture Screenshots with -cs option
-        if args.screen_capture:
-            take_screenshot(hostx.address, "80")
-            take_screenshot(hostx.address, "443")
-            take_screenshot(hostx.address, "8080")
 
         if hostx.hname:
+
             print("[+] Hostnames: ", end="\n")
             nessus(hostx)
 
             for item in hostx.hname:
                 print(item)
+
+                # Capture Screenshots with -cs option
+                if args.screen_capture:
+                    take_screenshot(item, "80")
+                    take_screenshot(item, "443")
+
                 # Write output to .TXT file
                 if args.format.lower() == 'txt':
                     vhostsf.write(item + "\n")
@@ -418,7 +385,7 @@ def main(argc, targets):
                     "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
                 vhostsf.write(row)
 
-                if (args.bing and hostx.apps):
+                if (hostx.apps):
                     apps = ','.join(hostx.apps)
                     row = "\"" + hostx.address + "\"," + "\"" + apps + "\"" + "\n"
                     appsf.write(row)
@@ -427,7 +394,7 @@ def main(argc, targets):
             print("[-] Hostnames: no results ")
             continue
 
-        if (args.bing and hostx.apps):
+        if (hostx.apps):
             print("[+] Web Apps:")
             for url in hostx.apps:
                 print(url)
@@ -463,7 +430,7 @@ if __name__ == "__main__":
     start_time = time()  # Start Counter
     display_banner()  # Banner
     targets = read_targets()
-
+    DRIVER=check_os(DRIVER)
     # Files
     appsf = open(args.output + "_webapps.txt", "wt")  # Write File
     vhostsf = open(args.output + "_hosts.csv", "wt")
