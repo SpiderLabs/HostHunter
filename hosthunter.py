@@ -39,16 +39,13 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 from fake_useragent import UserAgent
-ua = UserAgent()
-
-# Beta Feature
-os.environ['http_proxy'] = ''
 
 # Constants
 __version__ = "v1.6"
 __author__ = "Andreas Georgiou (@superhedgy)"
 
 # Options
+ua = UserAgent(use_cache_server=False)
 chrome_opt = Options()
 chrome_opt.add_argument("--ignore-certificate-errors")
 chrome_opt.add_argument("--test-type")
@@ -180,7 +177,7 @@ class target:
 # Nessus Function  - Generates IP/Hostname pairs in Nessus tool format.
 
 def nessus(hostx):
-    nessus = open(args.output + "_" + "nessus", 'a')
+    nessus = open("nessus_"+args.output, 'a')
     for host in hostx.hname:
         row = host + "[" + hostx.address + "], "
         nessus.write(row)
@@ -236,6 +233,7 @@ def validate(targ):
 def sslGrabber(hostx, port):
     try:
         cert = ssl.get_server_certificate((hostx.address, port))
+        cert = ssl.get_server_certificate(("2a04:4e42::81",443))
         x509 = OpenSSL.crypto.load_certificate(
             OpenSSL.crypto.FILETYPE_PEM, cert)
         cert_hostname = x509.get_subject().CN
@@ -247,7 +245,8 @@ def sslGrabber(hostx, port):
                 content = ext.__str__()
                 for alt_name in content.split(","):
                     alt_names.append(alt_name.strip()[4:])
-
+                    print(alt_name)
+        exit()
         # Add New HostNames to List
         if cert_hostname:
             for host in cert_hostname.split('\n'):
@@ -432,8 +431,8 @@ if __name__ == "__main__":
     targets = read_targets()
     DRIVER=check_os(DRIVER)
     # Files
-    appsf = open(args.output + "_webapps.txt", "wt")  # Write File
-    vhostsf = open(args.output + "_hosts.csv", "wt")
+    appsf = open("webapps_"+args.output, "wt")  # Write File
+    vhostsf = open(args.output, "wt")
 
     if args.format.lower() == "csv":
         vhostsf.write(
