@@ -4,12 +4,12 @@
 [![Issues](https://img.shields.io/github/issues/SpiderLabs/HostHunter?style=popout)](https://github.com/SpiderLabs/HostHunter/issues)
 [![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?style=social)](https://twitter.com/superhedgy)
 
-HostHunter v1.5
+HostHunter v1.6
 ======
 
 A tool to efficiently discover and extract hostnames providing a large set of target IP addresses. HostHunter utilises simple OSINT techniques to map IP addresses with virtual hostnames. It generates a CSV or TXT file containing the results of the reconnaissance.
 
-Latest version of HostHunter also takes screenshots of the targets, it is currently a beta functionality.
+Latest version of HostHunter also takes screenshots of the target web applicatiinos. This functionality is currently in beta.
 
 ## Demo
 <a href=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt><img src=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png alt=asciicast height=70% width=70%></a>
@@ -66,35 +66,33 @@ $ cat vhosts.csv
 ## More Examples
 HostHunter Help Page
 ```bash
-$ python3 hosthunter.py -h
-usage: hosthunter.py [-h] [-b] [-f FORMAT] [-o OUTPUT] [-sc] [-t TARGET] [-V]
-                     [targets]
+$ python3 ./hosthunter.py targets.txt -h
+usage: hosthunter.py [-h] [-f FORMAT] [-o OUTPUT] [-sc] [-t TARGET] [-V] [targets]
 
-|<--- HostHunter v1.5 - Help Page --->|
+[?] HostHunter v1.6 - Help Page
 
 positional arguments:
   targets               Sets the path of the target IPs file.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -b, --bing            Use Bing.com search engine to discover more hostnames
-                        associated with the target IP addresses.
   -f FORMAT, --format FORMAT
                         Choose between CSV and TXT output file formats.
   -o OUTPUT, --output OUTPUT
                         Sets the path of the output file.
   -sc, --screen-capture
-                        Capture a screen shot of any associated Web
-                        Applications.
+                        Capture a screenshot of any associated Web Applications.
   -t TARGET, --target TARGET
                         Scan a Single IP.
   -V, --version         Displays the current version.
 
+Author: Andreas Georgiou (@superhedgy)
+
 ```                        
 
-Run HostHunter with Bing and Screen Capture modules enabled
+Run HostHunter Screen Capture module and output a Nessus file:
 ```bash
-$ python3 hosthunter.py <targets.txt> --bing -sc -f csv -o hosts.csv
+$ python3 hosthunter.py <targets.txt> -sc -f csv -o hosts.csv
 ```
 Display Results
 ```bash
@@ -136,4 +134,4 @@ This project is licensed under the MIT License.
 
 ## StarGazers
 Thank you for all the support & feedback!
-[![Stargazers](https://starcharts.herokuapp.com/SpiderLabs/HostHunter.svg)](https://starcharts.herokuapp.com/SpiderLabs/HostHunter)
+[![Stargazers](https://star-history.t9t.io/#spiderlabs/hosthunter&spiderlabs/HostHunter)](https://star-history.t9t.io/#spiderlabs/hosthunter&spiderlabs/HostHunter)
