@@ -283,9 +283,8 @@ def analyze_header(header, hostx):
     except BaseException:
         return
 
+
 # queryAPI Function
-
-
 def queryAPI(url, hostx):
     try:
         r2 = requests.get(url + hostx.address, custom_headers).text
