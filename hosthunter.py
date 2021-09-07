@@ -248,8 +248,8 @@ def sslGrabber(hostx, port):
                 content = ext.__str__()
                 for alt_name in content.split(","):
                     alt_names.append(alt_name.strip()[4:])
-                    print(alt_name)
-        exit()
+                    #print(alt_name)
+
         # Add New HostNames to List
         if cert_hostname:
             for host in cert_hostname.split('\n'):
