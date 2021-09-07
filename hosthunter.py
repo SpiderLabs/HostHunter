@@ -38,19 +38,17 @@ import urllib3
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-from fake_useragent import UserAgent
 
 # Constants
 __version__ = "v1.6"
 __author__ = "Andreas Georgiou (@superhedgy)"
 
 # Options
-#ua = UserAgent(use_cache_server=False)
 chrome_opt = Options()
 chrome_opt.add_argument("--ignore-certificate-errors")
 chrome_opt.add_argument("--test-type")
 chrome_opt.add_argument("--headless")  # Comment out to Debug
-DRIVER = "" # Set Custom Chrome Driver Path
+DRIVER = ""  # Set Custom Chrome Driver Path
 sc_path = 'screen_captures'
 context = ssl.create_default_context()
 context.check_hostname = False
@@ -65,17 +63,19 @@ pattern_v6 = re.compile(regx_v6)
 pattern_url = re.compile(r"https?://(www\.)?|(/.*)?")
 pattern = re.compile(regx)
 
-custom_headers={
-"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-"Accept-Encoding": "gzip, deflate", "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8", "Dnt": "1", "Upgrade-Insecure-Requests": "1", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+custom_headers = {
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
 }
 # Hack to make things faster
 socket.setdefaulttimeout(3)
 
 # Argument Parser
 parser = argparse.ArgumentParser(
-    description='[?] HostHunter '+__version__ +' - Help Page',
-    epilog="Author: " + __author__ )
+    description='[?] HostHunter ' + __version__ + ' - Help Page',
+    epilog="Author: " + __author__)
 parser.add_argument(
     "-f",
     "--format",
@@ -145,6 +145,7 @@ def init_checks(args):
         else:
             exit()
 
+
 def read_targets():
     if args.target:
         targets = []
@@ -153,16 +154,18 @@ def read_targets():
         targets = open(args.targets, "rt")  # Read File
     return targets
 
+
+# Prints HostHunter Banner
 def display_banner():
     banner = (
         "\n | $$  | $$                              | $$  | $$                                     \n"
         " | $$  | $$                      | $$    | $$  | $$                      | $$\n"
         " | $$  | $$  /$$$$$$   /$$$$$$$ /$$$$$$  | $$  | $$ /$$   /$$ /$$$$$$$  /$$$$$$    /$$$$$$   /$$$$$$\n"
         " | $$$$$$$$ /$$__  $$ /$$_____/|_  $$_/  | $$$$$$$$| $$  | $$| $$__  $$|_  $$_/   /$$__  $$ /$$__  $$\n"
-        " | $$__  $$| $$  \ $$|  $$$$$$   | $$    | $$__  $$| $$  | $$| $$  \ $$  | $$    | $$$$$$$$| $$  \__/\n"
-        " | $$  | $$| $$__| $$ \____  $$  | $$ /$$| $$  | $$| $$__| $$| $$  | $$  | $$ /$$| $$_____/| $$\n"
+        " | $$__  $$| $$  \\ $$|  $$$$$$   | $$    | $$__  $$| $$  | $$| $$ \\ $$  | $$    | $$$$$$$$| $$  \\__/\n"
+        " | $$  | $$| $$__| $$ \\____  $$  | $$ /$$| $$  | $$| $$__| $$| $$  | $$  | $$ /$$| $$_____/| $$\n"
         " | $$  | $$|  $$$$$$/ /$$$$$$$/  |  $$$$/| $$  | $$|  $$$$$$/| $$  | $$  |  $$$$/|  $$$$$$$| $$\n"
-        " |__/  |__/ \______/ |_______/    \___/  |__/  |__/ \______/ |__/  |__/   \___/   \_______/|__/  " +
+        " |__/  |__/ \\______/ |_______/    \\___/  |__/  |__/ \\______/ |__/  |__/   \\___/   \\_______/|__/  " +
         __version__ +
         "\n")
 
@@ -171,6 +174,7 @@ def display_banner():
     print(" Author : ", __author__)
     print("\n" + "|" + "-" * 95 + "|", end="\n")
 
+
 class target:
     def __init__(self, address):
         self.address = address
@@ -178,8 +182,8 @@ class target:
         self.apps = []
         self.ipv6 = False
 
-# Nessus Function  - Generates IP/Hostname pairs in Nessus tool format.
 
+# Nessus Function  - Generates IP/Hostname pairs in Nessus tool format.
 def nessus(hostx):
     nessus = open("nessus_"+args.output, 'a')
     for host in hostx.hname:
@@ -194,7 +198,6 @@ def nessus(hostx):
 
 
 def take_screenshot(wpath, port):
-    source = default = '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body></html>'
     sleep(0.5)  # Delay
 
     if port == "80":
@@ -204,12 +207,6 @@ def take_screenshot(wpath, port):
 
     try:
         driver.get(url)
-    except BaseException:
-        # print ("[Debug] Failed while Fetching ",url) # Debug Functionality
-        pass
-    source = driver.page_source
-    # print ("[Debug] source value: ",driver.page_source) # Debug Functionality
-    try:
         driver.save_screenshot(sc_path + "/" + wpath + "_" + port + ".png")
     except BaseException:
         pass
@@ -248,7 +245,6 @@ def sslGrabber(hostx, port):
                 content = ext.__str__()
                 for alt_name in content.split(","):
                     alt_names.append(alt_name.strip()[4:])
-                    #print(alt_name)
 
         # Add New HostNames to List
         if cert_hostname:
@@ -263,17 +259,16 @@ def sslGrabber(hostx, port):
         for alt_name in alt_names:
             if (alt_name not in hostx.hname):
                 hostx.hname.append(alt_name)
-    except (urllib3.exceptions.ReadTimeoutError, requests.ConnectionError, urllib3.connection.ConnectionError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.TimeoutError, socket.error, socket.timeout) as e:
+    except (urllib3.exceptions.ReadTimeoutError, requests.ConnectionError, urllib3.connection.ConnectionError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.TimeoutError, socket.error, socket.timeout):
         pass
 
+
 # analyze_header Function
-
-
 def analyze_header(header, hostx):
     try:
         r2 = requests.get("http://" + hostx.address,
                           allow_redirects=False,
-                          headers = custom_headers,timeout=5).text
+                          headers=custom_headers, timeout=5).text
         r2.close()
         if (r2.status_code in range(300, 400)):
             try:
@@ -293,10 +288,7 @@ def analyze_header(header, hostx):
 
 def queryAPI(url, hostx):
     try:
-        r2 = requests.get(url + hostx.address, headers = {
-"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-"Accept-Encoding": "gzip, deflate", "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8", "Dnt": "1", "Upgrade-Insecure-Requests": "1", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
-}).text
+        r2 = requests.get(url + hostx.address, custom_headers).text
         if (r2.find("No DNS A records found") == -
             1) and (r2.find("API count exceeded") == -
                     1 and r2.find("error") == -
@@ -309,14 +301,23 @@ def queryAPI(url, hostx):
         # Add API count exceed detection
         else:
             pass
-    except (requests.exceptions.ConnectionError, urllib3.connection.ConnectionError, urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.TimeoutError, socket.error, socket.timeout) as e:
+    except (requests.exceptions.ConnectionError, urllib3.connection.ConnectionError, urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.TimeoutError, socket.error, socket.timeout):
         print("[*] Error: connecting with HackerTarget.com API")
     finally:
         sleep(0.5)
 
+
+def reverseiplookup(hostx):
+    try:
+        rhostname = socket.gethostbyaddr(hostx.address)[0]
+    except socket.error:
+        return
+    if (rhostname not in hostx.hname):
+        hostx.hname.append(rhostname)
+    return
+
+
 # Capture SIGINT
-
-
 def sig_handler(signal, frame):
     print("\n[!] SHUTTING DOWN HostHunter !!!")
     try:
@@ -328,11 +329,12 @@ def sig_handler(signal, frame):
     print("\n[!] Bye bye...\n")
     sys.exit(0)
 
+
 # check_os - Verifies the underlying platform
 def check_os(driver):
     osversion = platform.system()
     if driver != "":
-        return driver # Custom Driver Path Detected
+        return driver  # Custom Driver Path Detected
     elif osversion == "Darwin":
         return "./drivers/chromedriver_mac64"
     elif osversion == "Windows":
@@ -348,10 +350,13 @@ def main(argc, targets):
 
     for ip in targets:
         hostx = target(ip.replace("\n", ""))
-        if validate(hostx) == False:
+        if validate(hostx):
             continue
 
         print("\n[+] Target: %s" % hostx.address)
+
+        # Reverse DNS Lookup
+        reverseiplookup(hostx)
 
         # Fetch SSL Certificates
         sslGrabber(hostx, 443)
@@ -361,7 +366,6 @@ def main(argc, targets):
 
         # Querying HackerTarget.com API
         queryAPI("https://api.hackertarget.com/reverseiplookup/?q=", hostx)
-
 
         if hostx.hname:
 
@@ -412,7 +416,8 @@ def main(argc, targets):
         try:
             driver.close()
             driver.quit()
-        except (requests.exceptions.ConnectionError, urllib3.connection.ConnectionError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.TimeoutError, socket.error, socket.timeout) as e:
+        except (requests.exceptions.ConnectionError, urllib3.connection.ConnectionError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.TimeoutError, socket.error, socket.timeout):
+            # print(e)
             pass
 
     print("\n" + "|" + "-" * 95 + "|", end="\n\n")
@@ -434,7 +439,7 @@ if __name__ == "__main__":
     start_time = time()  # Start Counter
     display_banner()  # Banner
     targets = read_targets()
-    DRIVER=check_os(DRIVER)
+    DRIVER = check_os(DRIVER)
     # Files
     appsf = open("webapps_"+args.output, "wt")  # Write File
     vhostsf = open(args.output, "wt")
@@ -463,5 +468,5 @@ if __name__ == "__main__":
         print("    Screenshots saved at: ", os.getcwd() + "/" + sc_path)
         print("|" + "-" * 95 + "|", end="\n\n")
 
-    main(sys.argv,targets)  # Main Function
+    main(sys.argv, targets)  # Main Function
 # EOF
