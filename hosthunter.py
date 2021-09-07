@@ -45,7 +45,7 @@ __version__ = "v1.6"
 __author__ = "Andreas Georgiou (@superhedgy)"
 
 # Options
-ua = UserAgent(use_cache_server=False)
+#ua = UserAgent(use_cache_server=False)
 chrome_opt = Options()
 chrome_opt.add_argument("--ignore-certificate-errors")
 chrome_opt.add_argument("--test-type")
@@ -65,6 +65,10 @@ pattern_v6 = re.compile(regx_v6)
 pattern_url = re.compile(r"https?://(www\.)?|(/.*)?")
 pattern = re.compile(regx)
 
+custom_headers={
+"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+"Accept-Encoding": "gzip, deflate", "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8", "Dnt": "1", "Upgrade-Insecure-Requests": "1", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+}
 # Hack to make things faster
 socket.setdefaulttimeout(3)
 
@@ -233,7 +237,6 @@ def validate(targ):
 def sslGrabber(hostx, port):
     try:
         cert = ssl.get_server_certificate((hostx.address, port))
-        cert = ssl.get_server_certificate(("2a04:4e42::81",443))
         x509 = OpenSSL.crypto.load_certificate(
             OpenSSL.crypto.FILETYPE_PEM, cert)
         cert_hostname = x509.get_subject().CN
@@ -270,7 +273,7 @@ def analyze_header(header, hostx):
     try:
         r2 = requests.get("http://" + hostx.address,
                           allow_redirects=False,
-                          headers={'User-Agent': str(ua.random)})
+                          headers = custom_headers,timeout=5).text
         r2.close()
         if (r2.status_code in range(300, 400)):
             try:
@@ -290,8 +293,10 @@ def analyze_header(header, hostx):
 
 def queryAPI(url, hostx):
     try:
-        r2 = requests.get(url + hostx.address, headers={
-            'User-Agent': str(ua.random)}).text
+        r2 = requests.get(url + hostx.address, headers = {
+"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+"Accept-Encoding": "gzip, deflate", "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8", "Dnt": "1", "Upgrade-Insecure-Requests": "1", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+}).text
         if (r2.find("No DNS A records found") == -
             1) and (r2.find("API count exceeded") == -
                     1 and r2.find("error") == -
