@@ -233,9 +233,8 @@ def validate(targ):
     else:
         True
 
+
 # sslGrabber Function
-
-
 def sslGrabber(hostx, port):
     try:
         cert = ssl.get_server_certificate((hostx.address, port))
