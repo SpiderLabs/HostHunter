@@ -194,9 +194,8 @@ def nessus(hostx):
     nessus.close()
     return 0
 
+
 # take_screenshot (Beta) Function - Takes screenshots of target web applications.
-
-
 def take_screenshot(wpath, port):
     sleep(0.5)  # Delay
 
@@ -208,13 +207,19 @@ def take_screenshot(wpath, port):
     try:
         driver.get(url)
         driver.save_screenshot(sc_path + "/" + wpath + "_" + port + ".png")
-    except BaseException:
+    except (urllib3.exceptions.ReadTimeoutError, requests.ConnectionError,
+            urllib3.connection.ConnectionError,
+            urllib3.exceptions.MaxRetryError,
+            urllib3.exceptions.ConnectTimeoutError,
+            urllib3.exceptions.TimeoutError,
+            socket.error, socket.timeout):
         pass
     finally:
         driver.get('chrome://settings/clearBrowserData')
         driver.delete_all_cookies()  # Clear Cookies
 
 
+# Validate Input Targets - Needs to be Replaced
 def validate(targ):
     if not bool(re.match(pattern_v4, targ.address)):
         if bool(re.match(pattern_v6, targ.address)):
@@ -259,7 +264,10 @@ def sslGrabber(hostx, port):
         for alt_name in alt_names:
             if (alt_name not in hostx.hname):
                 hostx.hname.append(alt_name)
-    except (urllib3.exceptions.ReadTimeoutError, requests.ConnectionError, urllib3.connection.ConnectionError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.TimeoutError, socket.error, socket.timeout):
+    except (urllib3.exceptions.ReadTimeoutError, requests.ConnectionError,
+            urllib3.connection.ConnectionError, urllib3.exceptions.MaxRetryError,
+            urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.TimeoutError,
+            socket.error, socket.timeout):
         pass
 
 
@@ -300,7 +308,11 @@ def queryAPI(url, hostx):
         # Add API count exceed detection
         else:
             pass
-    except (requests.exceptions.ConnectionError, urllib3.connection.ConnectionError, urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.TimeoutError, socket.error, socket.timeout):
+    except (requests.exceptions.ConnectionError,
+            urllib3.connection.ConnectionError,
+            urllib3.exceptions.ConnectTimeoutError,
+            urllib3.exceptions.MaxRetryError,
+            urllib3.exceptions.TimeoutError, socket.error, socket.timeout):
         print("[*] Error: connecting with HackerTarget.com API")
     finally:
         sleep(0.5)
@@ -394,7 +406,8 @@ def main(argc, targets):
 
                 if (hostx.apps):
                     apps = ','.join(hostx.apps)
-                    row = "\"" + hostx.address + "\"," + "\"" + apps + "\"" + "\n"
+                    row = "\"" + hostx.address
+                    + "\"," + "\"" + apps + "\"" + "\n"
                     appsf.write(row)
 
         else:
@@ -415,7 +428,12 @@ def main(argc, targets):
         try:
             driver.close()
             driver.quit()
-        except (requests.exceptions.ConnectionError, urllib3.connection.ConnectionError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.TimeoutError, socket.error, socket.timeout):
+        except (requests.exceptions.ConnectionError,
+                urllib3.connection.ConnectionError,
+                urllib3.exceptions.MaxRetryError,
+                urllib3.exceptions.ConnectTimeoutError,
+                urllib3.exceptions.TimeoutError,
+                socket.error, socket.timeout):
             # print(e)
             pass
 
