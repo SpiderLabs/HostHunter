@@ -134,4 +134,4 @@ This project is licensed under the MIT License.
 
 ## StarGazers
 Thank you for all the support & feedback!
-[![Stargazers](https://star-history.t9t.io/#spiderlabs/hosthunter&spiderlabs/HostHunter)](https://star-history.t9t.io/#spiderlabs/hosthunter&spiderlabs/HostHunter)
+[![Stargazers over time](https://starchart.cc/SpiderLabs/HostHunter.svg)](https://starchart.cc/SpiderLabs/HostHunter)
