@@ -67,14 +67,15 @@ def initialise():
     parser.add_argument(
         "-f",
         "--format",
-        help="Choose between .CSV and .TXT output file formats.",
-        default="csv")
+        type=str,
+        help="Choose between .CSV, .TXT, Nessus output file formats.",
+        default="txt")
     parser.add_argument(
         "-o",
         "--output",
         help="Sets the path of the output file.",
         type=str,
-        default="hh_")
+        default="")
     parser.add_argument("-t", "--target", help="Hunt a Single IP.")
     parser.add_argument(
         "targets",
@@ -87,7 +88,7 @@ def initialise():
         "--grab",
         help="Choose which SSL ports to actively scan. Default ports:  21/tcp, 25/tcp, 443/tcp, 993/tcp, 8443/tcp",
         type=str,
-        default="21 25 443 993 8443")
+        default="21,25,443,993,8443")
     parser.add_argument(
         "-v",
         "--verify",
@@ -110,13 +111,16 @@ def initialise():
 
     if len(sys.argv) < 2:
         print("\n[*] Error: No Arguments provided. ")
-        print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv")
+        print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv \n")
         exit()
 
-    if args.format.lower() != "txt" and args.format.lower() != "csv":
-        print("\n[*] Error: File output format not supported. Choose between 'txt' or 'csv' .\n")
-        print("Example Usage: python3 hosthunter.py targets.txt -f txt ")
-        exit()
+    list_format=args.format.split(',')
+    print(list_format)
+    for type in list_format:
+        if type.lower() != "txt" and type.lower() != "csv" and  type.lower()!= "nessus" and type.lower()!= "all":
+            print("\n[*] Error:  Output File Format is not supported. Choose between 'txt' or 'csv' or 'Nessus' or all .\n")
+            print("Example Usage: python3 hosthunter.py targets.txt -f \"txt,csv,Nessus\" \n")
+            exit()
 
     if args.version:
         print("HostHunter version", __version__)
@@ -126,7 +130,7 @@ def initialise():
     if args.target and args.targets:
         print(
             "\n[*] Error: Too many arguments! Either select single target or specify a list of targets.")
-        print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv")
+        print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv\n")
         exit()
     # Targets Input File
     if args.targets and not os.path.exists(args.targets):
@@ -184,17 +188,6 @@ class target:
         self.ipv6 = False
 
 data_dict = {}
-
-# Nessus Function  - Generates IP/Hostname pairs in Nessus tool format.
-def nessus(hostx):
-    nessus = open("nessus_"+args.output, 'a')
-    for host in hostx.hname:
-        row = host + "[" + hostx.address + "], "
-        nessus.write(row)
-    if not hostx.hname:
-        nessus.write(hostx.address)
-    nessus.close()
-    return 0
 
 
 # Validate Input Targets - Needs to be Replaced
@@ -341,49 +334,65 @@ def sig_handler(signal, frame):
 
 # Write Function
 def write_results():
-
+    base_path=""
+    list_format=args.format.split(',')
+    list_format=[format_type.lower() for format_type in list_format]
     # Output File Naming & Path
-    base_path = datetime.now().strftime("%d_%m_%Y-%H.%M.%S")
+    if not args.output:
+        base_path = "hh_"+ datetime.now().strftime("%d_%m_%Y-%H.%M.%S")
     appsf = open(args.output+base_path+".webapps", "wt")  # Write File
     vhostsf = open(args.output+base_path+".vhosts", "wt")
+    vhostsf_csv = open(args.output+base_path+".vhosts.csv", "wt")
+    nessusf = open(args.output+base_path+".nessus", 'wt')
 
-    if args.format.lower() == "csv":
-        vhostsf.write(
-            "\"" +
-            "IP Address" +
-            "\",\"" +
-            "Port/Protocol" +
-            "\",\"" +
-            "Domains" +
-            "\",\"" +
-            "Operating System" +
-            "\",\"" +
-            "OS Version" +
-            "\",\"" +
-            "Notes" +
-            "\"\n")  # vhosts.csv Header
+    for format in list_format:
+        match format:
+            case "csv":
+                # Write Header in CSV File
+                vhostsf_csv.write(
+                    "\"" +
+                    "IP Address" +
+                    "\",\"" +
+                    "Port/Protocol" +
+                    "\",\"" +
+                    "Domains" +
+                    "\",\"" +
+                    "Operating System" +
+                    "\",\"" +
+                    "OS Version" +
+                    "\",\"" +
+                    "Notes" +
+                    "\"\n")  # vhosts.csv Header
+                    # Merging the lists prooved Faster than list iterations
+                for item in data_dict:
+                    for host in data_dict[item].hname:
+                        hostnames = ','.join(data_dict[item].hname)
+                        row = "\"" + data_dict[item].address + "\"," + "\"443/tcp\"" + \
+                        "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
+                    vhostsf_csv.write(row)
+            case "nessus":
+                # Nessus Function  - Generates IP/Hostname pairs in Nessus tool format.
+                for item in data_dict:
+                    for host in data_dict[item].hname:
+                        row = host + "[" + data_dict[item].address + "], "
+                        nessusf.write(row)
+                    if not data_dict[item].hname:
+                        nessusf.write(data_dict[item].address)
+                    nessusf.close()
 
-    # Write Results in Nessus File
-    #nessus(hostx)
+            case "txt":
+                for item in data_dict:
+                    for hname in data_dict[item].hname:
+                        vhostsf.write(hname + "\n")
+                    vhostsf.close()
 
     # Write Results in TXT File
     for item in data_dict:
         #print(data_dict[item].address)
 
-        if args.format.lower() == 'txt':
-            for hname in data_dict[item].hname:
-                vhostsf.write(hname + "\n")
-
-        # Write Results in CSV File
-        if args.format.lower() == 'csv':
-            # Merging the lists prooved Faster than list iterations
-            hostnames = ','.join(data_dict[item].hname)
-            row = "\"" + data_dict[item].address + "\"," + "\"443/tcp\"" + \
-            "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
-            vhostsf.write(row)
 
         if (data_dict[item].apps):
-            apps = ','.join(hostx.apps)
+            apps = ','.join(data_dict[item].apps)
             row = "\"" + data_dict[item].address
             + "\"," + "\"" + apps + "\"" + "\n"
             appsf.write(row)
@@ -418,7 +427,7 @@ def verify(hostx):
 # Main Function
 def main(argc, targets):
     counter = 0
-    ports=args.grab.split(' ')
+    ports=args.grab.split(',')
 
     if args.debug == True:
         print("[!] Debug Mode: ON")
