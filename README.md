@@ -6,13 +6,13 @@
 
 HostHunter v2 (Beta)
 ======
-
+<img align="center" src=https://github.com/SpiderLabs/HostHunter/blob/beta_v2/hosthunter_logo.png alt=logo height=550 width=550>
 A tool to efficiently discover and extract hostnames providing a large set of target IP addresses. HostHunter utilises simple OSINT techniques to map IP addresses with virtual hostnames. It generates a CSV or TXT file containing the results of the reconnaissance.
 
 Latest version of HostHunter also verified output by resolving the discovered hostnames. This functionality is currently in beta.
 
 ## Demo
-<a href=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt><img src=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png alt=asciicast height=70% width=70%></a>
+<a  align="center" href=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt><img src=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png alt=asciicast height=70% width=70%></a>
 
 __Click on the thumbnail above to view the demo.__
 
