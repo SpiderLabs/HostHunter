@@ -9,7 +9,7 @@ HostHunter v2 (Beta)
 
 A tool to efficiently discover and extract hostnames providing a large set of target IP addresses. HostHunter utilises simple OSINT techniques to map IP addresses with virtual hostnames. It generates a CSV or TXT file containing the results of the reconnaissance.
 
-Latest version of HostHunter also takes screenshots of the target web applicatiinos. This functionality is currently in beta.
+Latest version of HostHunter also verified output by resolving the discovered hostnames. This functionality is currently in beta.
 
 ## Demo
 <a href=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt><img src=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png alt=asciicast height=70% width=70%></a>
@@ -37,26 +37,28 @@ $ cat vhosts.csv
 ## More Examples
 HostHunter Help Page
 ```bash
-$ python3 ./hosthunter.py targets.txt -h
-usage: hosthunter.py [-h] [-f FORMAT] [-o OUTPUT] [-sc] [-t TARGET] [-V] [targets]
+$ python3 ./hosthunter.py -h
+usage: hosthunter.py [-h] [-f FORMAT] [-o OUTPUT] [-t TARGET] [-g GRAB] [-v] [-V] [-d] [targets]
 
-[?] HostHunter v1.6 - Help Page
+[?] HostHunter v2.0 - Help Page
 
 positional arguments:
   targets               Sets the path of the target IPs file.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -f FORMAT, --format FORMAT
-                        Choose between CSV and TXT output file formats.
+                        Choose between .CSV and .TXT output file formats.
   -o OUTPUT, --output OUTPUT
                         Sets the path of the output file.
-  -sc, --screen-capture
-                        Capture a screenshot of any associated Web Applications.
   -t TARGET, --target TARGET
-                        Scan a Single IP.
+                        Hunt a Single IP.
+  -g GRAB, --grab GRAB  Choose which SSL ports to actively scan. Default ports: 21/tcp, 25/tcp, 443/tcp, 993/tcp, 8443/tcp
+  -v, --verify          Attempts to resolve IP Address
   -V, --version         Displays the current version.
+  -d, --debug           Displays additional output and debugging information.
 
+Author: Andreas Georgiou (@superhedgy)
 Author: Andreas Georgiou (@superhedgy)
 
 ```                        
@@ -85,14 +87,16 @@ $ open ./screen_captures/
 - [x] Verifies Internet access.
 - [x] Retrieves hostname values from services at 21/tcp, 25/tcp, 80/tcp and 443/tcp ports.
 - [x] Supports Nessus target format output.  
+- [x] Improve output (IPs, HostNames, FQDNs)  
+- [X] Actively pull SSL certificates from other TCP ports  
+- [X] Select with SSL ports to target
+- [X] Verify discovered hostnames against target IPs
 
 ## Coming Next
-- [ ] Improve output (IPs, HostNames, FQDNs)  
 - [ ] Pause and Resume Execution   
 - [ ] Support for a Premium HackerTarget API key   
 - [ ] Support for IPv6   
 - [ ] Gather information from additional APIs  
-- [ ] Actively pull SSL certificates from other TCP ports  
 
 ## Notes
 * Free APIs throttle the amount of requests per day per source IP address.
