@@ -12,7 +12,7 @@
 # Author  : Andreas Georgiou (@superhedgy)
 # Email   : ageorgiou@trustwave.com
 # Twitter : @superhedgy
-# Version: v1.6
+# Version: v2.0
 #
 # [+] Simple Usage Example:
 #
@@ -20,19 +20,20 @@
 #
 #       $ cat vhosts.csv
 
-# Standard Libraries
+# Standard Python Libraries
 import argparse
 import sys
 import os
 import ssl
 import socket
-import re
 import signal
 import platform
+import ipaddress
+import re
+from datetime import datetime
 from time import time, sleep
-# External Libraries
-from selenium.webdriver.chrome.options import Options
-from selenium import webdriver
+from validator_collection import checkers # New Library
+# External Python Libraries
 import OpenSSL
 import urllib3
 import requests
@@ -40,27 +41,19 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # Constants
-__version__ = "v1.6"
+__version__ = "v2.0"
 __author__ = "Andreas Georgiou (@superhedgy)"
 
-# Options
-chrome_opt = Options()
-chrome_opt.add_argument("--ignore-certificate-errors")
-chrome_opt.add_argument("--test-type")
-chrome_opt.add_argument("--headless")  # Comment out to Debug
-DRIVER = ""  # Set Custom Chrome Driver Path
-sc_path = 'screen_captures'
+global appsf
+global vhostsf
+
 context = ssl.create_default_context()
 context.check_hostname = False
 context.verify_mode = ssl.CERT_OPTIONAL
 context.load_default_certs()
 regx = "<li class=\"b_algo\"(.+?)</li>"
 regx_h3 = "<h2><a hre=\"(.?)\""
-regx_v4 = r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}"
-regx_v6 = r"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"
-pattern_v4 = re.compile(regx_v4)
-pattern_v6 = re.compile(regx_v6)
-pattern_url = re.compile(r"https?://(www\.)?|(/.*)?")
+#pattern_url = re.compile(r"https?://(www\.)?|(/.*)?")
 pattern = re.compile(regx)
 
 custom_headers = {
@@ -72,51 +65,57 @@ custom_headers = {
 # Hack to make things faster
 socket.setdefaulttimeout(3)
 
-# Argument Parser
-parser = argparse.ArgumentParser(
-    description='[?] HostHunter ' + __version__ + ' - Help Page',
-    epilog="Author: " + __author__)
-parser.add_argument(
-    "-f",
-    "--format",
-    help="Choose between CSV and TXT output file formats.",
-    default="csv")
-parser.add_argument(
-    "-o",
-    "--output",
-    help="Sets the path of the output file.",
-    type=str,
-    default="vhosts.csv")
-parser.add_argument(
-    "-sc",
-    "--screen-capture",
-    help="Capture a screenshot of any associated Web Applications.",
-    action="store_true",
-    default=False)
-parser.add_argument("-t", "--target", help="Scan a Single IP.")
-parser.add_argument(
-    "targets",
-    nargs='?',
-    help="Sets the path of the target IPs file.",
-    type=str,
-    default="")
-parser.add_argument(
-    "-V",
-    "--version",
-    help="Displays the current version.",
-    action="store_true",
-    default=False)
-args = parser.parse_args()
+def initialise():
+    global args
+    # Argument Parser
+    parser = argparse.ArgumentParser(
+        description='[?] HostHunter ' + __version__ + ' - Help Page',
+        epilog="Author: " + __author__)
+    parser.add_argument(
+        "-f",
+        "--format",
+        help="Choose between .CSV and .TXT output file formats.",
+        default="csv")
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Sets the path of the output file.",
+        type=str,
+        default="vhosts")
+    parser.add_argument(
+        "-sc",
+        "--screen-capture",
+        help="Capture a screenshot of any associated Web Applications.",
+        action="store_true",
+        default=False)
+    parser.add_argument("-t", "--target", help="Hunt a Single IP.")
+    parser.add_argument(
+        "targets",
+        nargs='?',
+        help="Sets the path of the target IPs file.",
+        type=str,
+        default="")
+    parser.add_argument(
+        "-V",
+        "--version",
+        help="Displays the current version.",
+        action="store_true",
+        default=False)
+    parser.add_argument(
+        "-d",
+        "--debug",
+        help="Displays additionla output and debugging information.",
+        action="store_true",
+        default=False)
+    args = parser.parse_args()
 
-
-def init_checks(args):
     if len(sys.argv) < 2:
-        print("[*] Error: No Arguments provided. ")
+        print("\n[*] Error: No Arguments provided. ")
         print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv")
         exit()
 
     if args.format.lower() != "txt" and args.format.lower() != "csv":
-        print("\n [*] Error: File output format not supported. Choose between 'txt' or 'csv' .\n")
+        print("\n[*] Error: File output format not supported. Choose between 'txt' or 'csv' .\n")
         print("Example Usage: python3 hosthunter.py targets.txt -f txt ")
         exit()
 
@@ -147,11 +146,14 @@ def init_checks(args):
 
 
 def read_targets():
+    targets = []
     if args.target:
-        targets = []
         targets.append(args.target)
     else:
-        targets = open(args.targets, "rt")  # Read File
+        targets_fp = open(args.targets, "rt")  # Read File
+        for target in targets_fp:
+            targets.append(target)
+        targets_fp.close()
     return targets
 
 
@@ -172,7 +174,7 @@ def display_banner():
     print("%s" % banner)
     print("\n", "HostHunter: ", __version__)
     print(" Author : ", __author__)
-    print("\n" + "|" + "-" * 95 + "|", end="\n")
+    print("\n" + "|" + "-" * 100 + "|", end="\n\n")
 
 
 class target:
@@ -182,6 +184,7 @@ class target:
         self.apps = []
         self.ipv6 = False
 
+data_dict = {}
 
 # Nessus Function  - Generates IP/Hostname pairs in Nessus tool format.
 def nessus(hostx):
@@ -195,7 +198,7 @@ def nessus(hostx):
     return 0
 
 
-# take_screenshot (Beta) Function - Takes screenshots of target web applications.
+# take_screenshot (Beta) Function - Takes screenshots of targets.
 def take_screenshot(wpath, port):
     sleep(0.5)  # Delay
 
@@ -220,18 +223,31 @@ def take_screenshot(wpath, port):
 
 
 # Validate Input Targets - Needs to be Replaced
-def validate(targ):
-    if not bool(re.match(pattern_v4, targ.address)):
-        if bool(re.match(pattern_v6, targ.address)):
-            targ.ipv6 = True
+def validate(hostx):
+    if not checkers.is_ipv4(hostx.address):
+        if checkers.is_ipv6(hostx.address):
+            hostx.ipv6 = True
+            return True
         else:
             print(
-                "\n\"",
-                targ.address,
-                "\" is not a valid IPv4 or IPv6 address.")
+                "\n[*] \"",
+                hostx.address,
+                "\" is not a valid IPv4/IPv6 address and will be ignored.")
             return False
     else:
-        True
+        return True
+
+
+## sslGrabber - IPv6
+def sslGrabber6(hostx,port):
+    print(hostx.address)
+    print (port)
+    context = ssl.create_default_context()
+    context.check_hostname = False
+    conn = context.wrap_socket(socket.socket(socket.AF_INET6), server_hostname=hostx.address)
+    conn.connect((hostx.address, port))
+    cert = conn.getpeercert()
+    return cert['subjectAltName'][0][1]
 
 
 # sslGrabber Function
@@ -256,6 +272,8 @@ def sslGrabber(hostx, port):
                 if (host == "") or (host in hostx.hname):
                     pass
                 else:
+                    if args.debug == True:
+                        print(host)
                     try:
                         host = host.replace('*.', '')
                     finally:
@@ -263,9 +281,12 @@ def sslGrabber(hostx, port):
         for alt_name in alt_names:
             if (alt_name not in hostx.hname):
                 hostx.hname.append(alt_name)
-    except (urllib3.exceptions.ReadTimeoutError, requests.ConnectionError,
-            urllib3.connection.ConnectionError, urllib3.exceptions.MaxRetryError,
-            urllib3.exceptions.ConnectTimeoutError, urllib3.exceptions.TimeoutError,
+    except (urllib3.exceptions.ReadTimeoutError,
+            requests.ConnectionError,
+            urllib3.connection.ConnectionError,
+            urllib3.exceptions.MaxRetryError,
+            urllib3.exceptions.ConnectTimeoutError,
+            urllib3.exceptions.TimeoutError,
             socket.error, socket.timeout):
         pass
 
@@ -312,7 +333,7 @@ def queryAPI(url, hostx):
             urllib3.exceptions.ConnectTimeoutError,
             urllib3.exceptions.MaxRetryError,
             urllib3.exceptions.TimeoutError, socket.error, socket.timeout):
-        print("[*] Error: connecting with HackerTarget.com API")
+        print("\n[*] Error: connecting with HackerTarget.com API")
     finally:
         sleep(0.5)
 
@@ -329,136 +350,24 @@ def reverseiplookup(hostx):
 
 # Capture SIGINT
 def sig_handler(signal, frame):
-    print("\n[!] SHUTTING DOWN HostHunter !!!")
+    print("\n[!] HostHunter is shutting down!")
     try:
         driver.close()
         driver.quit()
         signal.pause()
     except BaseException:
         pass
-    print("\n[!] Bye bye...\n")
+    print("\n[!] See you soon...\n")
     sys.exit(0)
 
 
-# check_os - Verifies the underlying platform
-def check_os(driver):
-    osversion = platform.system()
-    if driver != "":
-        return driver  # Custom Driver Path Detected
-    elif osversion == "Darwin":
-        return "./drivers/chromedriver_mac64"
-    elif osversion == "Windows":
-        return "./drivers/chromedriver_win32"
-    elif osversion == "Linux":
-        return "./drivers/chromedriver_linux64"
+# Write Function
+def write_results():
 
-# Main Function - Read IPs from <targets.txt> file
-
-
-def main(argc, targets):
-    counter = 0
-
-    for ip in targets:
-        hostx = target(ip.replace("\n", ""))
-        if validate(hostx):
-            continue
-
-        print("\n[+] Target: %s" % hostx.address)
-
-        # Reverse DNS Lookup
-        reverseiplookup(hostx)
-
-        # Fetch SSL Certificates
-        sslGrabber(hostx, 443)
-
-        # Check Port 80
-        analyze_header("Location", hostx)
-
-        # Querying HackerTarget.com API
-        queryAPI("https://api.hackertarget.com/reverseiplookup/?q=", hostx)
-
-        if hostx.hname:
-
-            print("[+] Hostnames: ", end="\n")
-            nessus(hostx)
-
-            for item in hostx.hname:
-                print(item)
-
-                # Capture Screenshots with -cs option
-                if args.screen_capture:
-                    take_screenshot(item, "80")
-                    take_screenshot(item, "443")
-
-                # Write output to .TXT file
-                if args.format.lower() == 'txt':
-                    vhostsf.write(item + "\n")
-                counter += 1
-
-            # Write output to .CSV file
-            if args.format.lower() == 'csv':
-                # Merging the lists prooved Faster than list iterations
-                hostnames = ','.join(hostx.hname)
-                row = "\"" + hostx.address + "\"," + "\"443/tcp\"" + \
-                    "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
-                vhostsf.write(row)
-
-                if (hostx.apps):
-                    apps = ','.join(hostx.apps)
-                    row = "\"" + hostx.address
-                    + "\"," + "\"" + apps + "\"" + "\n"
-                    appsf.write(row)
-
-        else:
-            print("[-] Hostnames: no results ")
-            continue
-
-        if (hostx.apps):
-            print("[+] Web Apps:")
-            for url in hostx.apps:
-                print(url)
-
-        # END FOR LOOP
-    # END IF
-    if args.targets:
-        targets.close()
-
-    if args.screen_capture:
-        try:
-            driver.close()
-            driver.quit()
-        except (requests.exceptions.ConnectionError,
-                urllib3.connection.ConnectionError,
-                urllib3.exceptions.MaxRetryError,
-                urllib3.exceptions.ConnectTimeoutError,
-                urllib3.exceptions.TimeoutError,
-                socket.error, socket.timeout):
-            # print(e)
-            pass
-
-    print("\n" + "|" + "-" * 95 + "|", end="\n\n")
-    print("  Reconnaissance Completed!", end="\n\n")
-    if counter == 0:
-        print("  0 hostname was discovered in %s sec" %
-              (round(time() - start_time, 2)), end="\n\n")
-    else:
-        print("  %s hostnames were discovered in %s sec" %
-              (counter, round(time() - start_time, 2)), end="\n\n")
-    print("|" + "-" * 95 + "|")
-# End of Main Function
-
-
-# Main Module
-if __name__ == "__main__":
-    signal.signal(signal.SIGINT, sig_handler)  # Signal Listener
-    init_checks(args)  # Input Argument Checks
-    start_time = time()  # Start Counter
-    display_banner()  # Banner
-    targets = read_targets()
-    DRIVER = check_os(DRIVER)
-    # Files
-    appsf = open("webapps_"+args.output, "wt")  # Write File
-    vhostsf = open(args.output, "wt")
+    # Output File Naming & Path
+    base_path = datetime.now().strftime("%d%m%Y_%H%M%S")
+    appsf = open(args.output+base_path+".webapps", "wt")  # Write File
+    vhostsf = open(args.output+base_path, "wt")
 
     if args.format.lower() == "csv":
         vhostsf.write(
@@ -476,13 +385,109 @@ if __name__ == "__main__":
             "Notes" +
             "\"\n")  # vhosts.csv Header
 
-    if args.screen_capture:
-        driver = webdriver.Chrome(executable_path=DRIVER, options=chrome_opt)
-        driver.set_page_load_timeout(12)
-        if not os.path.exists(sc_path):
-            os.makedirs(sc_path)
-        print("    Screenshots saved at: ", os.getcwd() + "/" + sc_path)
-        print("|" + "-" * 95 + "|", end="\n\n")
+    # Write Results in Nessus File
+    #nessus(hostx)
 
-    main(sys.argv, targets)  # Main Function
+    # Write Results in TXT File
+    for item in data_dict:
+        #print(data_dict[item].address)
+
+        if args.format.lower() == 'txt':
+            for hname in data_dict[item].hname:
+                vhostsf.write(hname + "\n")
+
+    # Write Results in CSV File
+    if args.format.lower() == 'csv':
+        # Merging the lists prooved Faster than list iterations
+        hostnames = ','.join(hostx.hname)
+        row = "\"" + hostx.address + "\"," + "\"443/tcp\"" + \
+        "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
+        vhostsf.write(row)
+
+        if (hostx.apps):
+            apps = ','.join(hostx.apps)
+            row = "\"" + hostx.address
+            + "\"," + "\"" + apps + "\"" + "\n"
+            appsf.write(row)
+    # Write Results in HTML File
+
+
+# stats Function - Prints Statistics cause metrics are fun
+def stats(start_time,counter,target_list):
+    print("\n" + "|" + "-" * 100 + "|", end="\n\n")
+    print("  Hunting Completed!", end="\n\n")
+    print("  Searched against",len(target_list),"targets",end="\n\n")
+    if counter == 0:
+        print("  0 hostname was discovered in %s sec" %
+              (round(time() - start_time, 2)), end="\n\n")
+    else:
+        print("  %s hostnames were discovered in %s sec" %
+              (counter, round(time() - start_time, 2)), end="\n\n")
+    print("|" + "-" * 100 + "|")
+
+
+# Main Function
+def main(argc, targets):
+    counter = 0
+
+    if args.debug == True:
+        print("[!] Debug Mode: ON")
+
+    for ip in targets:
+        hostx = target(ip.replace("\n", ""))
+
+        if validate(hostx):
+            print("\n[+] Target: %s" % hostx.address)
+        else:
+            continue
+        # Reverse DNS Lookup
+        reverseiplookup(hostx)
+    #    sslGrabber6(hostx,443)
+    #    break
+        # Fetch SSL Certificates [Ability to Add Custom SSL Certificates]
+        sslGrabber(hostx, 21)
+        sslGrabber(hostx, 25)
+        sslGrabber(hostx, 443)
+        sslGrabber(hostx, 8443)
+        sslGrabber(hostx, 993)
+        # Check 80/tcp over HTTP
+        analyze_header("Location", hostx)
+
+        # Querying HackerTarget.com API
+        queryAPI("https://api.hackertarget.com/reverseiplookup/?q=", hostx)
+
+        if hostx.hname:
+
+            print("[+] Hostnames: ", end="\n")
+            for item in hostx.hname:
+                print(item)
+                counter += 1
+
+        else:
+            print("[-] Hostnames: no results \n")
+            continue
+
+        if (hostx.apps):
+            print("[+] Web Apps:")
+            for url in hostx.apps:
+                print(url)
+
+        data_dict["hostx.address"] = hostx
+        # END FOR LOOP
+    # END IF
+
+    write_results()
+    return counter
+# End of Main Function
+
+
+# Main Module
+if __name__ == "__main__":
+    signal.signal(signal.SIGINT, sig_handler)  # Signal Listener
+    start_time = time()  # Start Counter
+    initialise()  # Input Argument Checks
+    display_banner()  # Banner
+    targets = read_targets()
+    counter = main(sys.argv,targets)  # Main Function
+    stats(start_time,counter,targets)
 # EOF
