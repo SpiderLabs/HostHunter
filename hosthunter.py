@@ -32,8 +32,8 @@ import ipaddress
 import re
 from datetime import datetime
 from time import time, sleep
-from validator_collection import checkers # New Library
 # External Python Libraries
+from validator_collection import checkers
 import OpenSSL
 import urllib3
 import requests
@@ -43,27 +43,20 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 # Constants
 __version__ = "v2.0"
 __author__ = "Andreas Georgiou (@superhedgy)"
-
+# Hack to make things faster
+socket.setdefaulttimeout(3)
 global appsf
 global vhostsf
-
-context = ssl.create_default_context()
-context.check_hostname = False
-context.verify_mode = ssl.CERT_OPTIONAL
-context.load_default_certs()
 regx = "<li class=\"b_algo\"(.+?)</li>"
-regx_h3 = "<h2><a hre=\"(.?)\""
-#pattern_url = re.compile(r"https?://(www\.)?|(/.*)?")
+pattern_url = re.compile(r"https?://(www\.)?|(/.*)?")
 pattern = re.compile(regx)
-
 custom_headers = {
     "Accept": "*/*",
     "Accept-Encoding": "gzip, deflate",
     "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
 }
-# Hack to make things faster
-socket.setdefaulttimeout(3)
+
 
 def initialise():
     global args
@@ -81,13 +74,7 @@ def initialise():
         "--output",
         help="Sets the path of the output file.",
         type=str,
-        default="vhosts")
-    parser.add_argument(
-        "-sc",
-        "--screen-capture",
-        help="Capture a screenshot of any associated Web Applications.",
-        action="store_true",
-        default=False)
+        default="hh_")
     parser.add_argument("-t", "--target", help="Hunt a Single IP.")
     parser.add_argument(
         "targets",
@@ -95,6 +82,18 @@ def initialise():
         help="Sets the path of the target IPs file.",
         type=str,
         default="")
+    parser.add_argument(
+        "-g",
+        "--grab",
+        help="Choose which SSL ports to actively scan. Default ports:  21/tcp, 25/tcp, 443/tcp, 993/tcp, 8443/tcp",
+        type=str,
+        default="21 25 443 993 8443")
+    parser.add_argument(
+        "-v",
+        "--verify",
+        help="Attempts to resolve IP Address",
+        action="store_true",
+        default=False)
     parser.add_argument(
         "-V",
         "--version",
@@ -104,7 +103,7 @@ def initialise():
     parser.add_argument(
         "-d",
         "--debug",
-        help="Displays additionla output and debugging information.",
+        help="Displays additional output and debugging information.",
         action="store_true",
         default=False)
     args = parser.parse_args()
@@ -198,30 +197,6 @@ def nessus(hostx):
     return 0
 
 
-# take_screenshot (Beta) Function - Takes screenshots of targets.
-def take_screenshot(wpath, port):
-    sleep(0.5)  # Delay
-
-    if port == "80":
-        url = "http://" + wpath
-    else:
-        url = "https://" + wpath + ":" + port
-
-    try:
-        driver.get(url)
-        driver.save_screenshot(sc_path + "/" + wpath + "_" + port + ".png")
-    except (urllib3.exceptions.ReadTimeoutError, requests.ConnectionError,
-            urllib3.connection.ConnectionError,
-            urllib3.exceptions.MaxRetryError,
-            urllib3.exceptions.ConnectTimeoutError,
-            urllib3.exceptions.TimeoutError,
-            socket.error, socket.timeout):
-        pass
-    finally:
-        driver.get('chrome://settings/clearBrowserData')
-        driver.delete_all_cookies()  # Clear Cookies
-
-
 # Validate Input Targets - Needs to be Replaced
 def validate(hostx):
     if not checkers.is_ipv4(hostx.address):
@@ -244,6 +219,8 @@ def sslGrabber6(hostx,port):
     print (port)
     context = ssl.create_default_context()
     context.check_hostname = False
+    context.verify_mode = ssl.CERT_OPTIONAL
+    context.load_default_certs()
     conn = context.wrap_socket(socket.socket(socket.AF_INET6), server_hostname=hostx.address)
     conn.connect((hostx.address, port))
     cert = conn.getpeercert()
@@ -252,6 +229,7 @@ def sslGrabber6(hostx,port):
 
 # sslGrabber Function
 def sslGrabber(hostx, port):
+
     try:
         cert = ssl.get_server_certificate((hostx.address, port))
         x509 = OpenSSL.crypto.load_certificate(
@@ -365,9 +343,9 @@ def sig_handler(signal, frame):
 def write_results():
 
     # Output File Naming & Path
-    base_path = datetime.now().strftime("%d%m%Y_%H%M%S")
+    base_path = datetime.now().strftime("%d_%m_%Y-%H.%M.%S")
     appsf = open(args.output+base_path+".webapps", "wt")  # Write File
-    vhostsf = open(args.output+base_path, "wt")
+    vhostsf = open(args.output+base_path+".vhosts", "wt")
 
     if args.format.lower() == "csv":
         vhostsf.write(
@@ -396,17 +374,17 @@ def write_results():
             for hname in data_dict[item].hname:
                 vhostsf.write(hname + "\n")
 
-    # Write Results in CSV File
-    if args.format.lower() == 'csv':
-        # Merging the lists prooved Faster than list iterations
-        hostnames = ','.join(hostx.hname)
-        row = "\"" + hostx.address + "\"," + "\"443/tcp\"" + \
-        "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
-        vhostsf.write(row)
+        # Write Results in CSV File
+        if args.format.lower() == 'csv':
+            # Merging the lists prooved Faster than list iterations
+            hostnames = ','.join(data_dict[item].hname)
+            row = "\"" + data_dict[item].address + "\"," + "\"443/tcp\"" + \
+            "," + "\"" + hostnames + "\",\"\",\"\",\"\"" + "\n"
+            vhostsf.write(row)
 
-        if (hostx.apps):
+        if (data_dict[item].apps):
             apps = ','.join(hostx.apps)
-            row = "\"" + hostx.address
+            row = "\"" + data_dict[item].address
             + "\"," + "\"" + apps + "\"" + "\n"
             appsf.write(row)
     # Write Results in HTML File
@@ -425,10 +403,22 @@ def stats(start_time,counter,target_list):
               (counter, round(time() - start_time, 2)), end="\n\n")
     print("|" + "-" * 100 + "|")
 
+# verify  Function - Attempts to Verify Target IP Matches Hostname
+def verify(hostx):
+    for item in hostx.hname:
+        try:
+            resolved = socket.gethostbyname_ex(item)
+            if hostx.address in resolved[2]:
+                print(item)
+        except:
+            continue
+
+    return len(hostx.hname)
 
 # Main Function
 def main(argc, targets):
     counter = 0
+    ports=args.grab.split(' ')
 
     if args.debug == True:
         print("[!] Debug Mode: ON")
@@ -443,13 +433,11 @@ def main(argc, targets):
         # Reverse DNS Lookup
         reverseiplookup(hostx)
     #    sslGrabber6(hostx,443)
-    #    break
-        # Fetch SSL Certificates [Ability to Add Custom SSL Certificates]
-        sslGrabber(hostx, 21)
-        sslGrabber(hostx, 25)
-        sslGrabber(hostx, 443)
-        sslGrabber(hostx, 8443)
-        sslGrabber(hostx, 993)
+
+        # Fetch SSL Certificates [Default: 21, 25, 443, 993, 8443]
+        for port in ports:
+            sslGrabber(hostx, port)
+
         # Check 80/tcp over HTTP
         analyze_header("Location", hostx)
 
@@ -457,14 +445,16 @@ def main(argc, targets):
         queryAPI("https://api.hackertarget.com/reverseiplookup/?q=", hostx)
 
         if hostx.hname:
-
-            print("[+] Hostnames: ", end="\n")
-            for item in hostx.hname:
-                print(item)
-                counter += 1
+            if args.verify:
+                counter = verify(hostx)
+            else:
+                print("[+] Hostnames: ")
+                for item in hostx.hname:
+                    print(item)
+                    counter += 1
 
         else:
-            print("[-] Hostnames: no results \n")
+            print("[-] Hostnames: no results")
             continue
 
         if (hostx.apps):
