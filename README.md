@@ -14,13 +14,13 @@ Latest version of HostHunter also verified output by resolving the discovered ho
 ## Demo
 <a href=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt><img src=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png alt=asciicast height=70% width=70%></a>
 
-Click on the thumbnail above to view the demo.
+__Click on the thumbnail above to view the demo.__
 
 ## Installation
-* Tested with Python 3.7.2.
+* Tested with Python 3.10.8.
 
 ### Linux / Mac OS
-* Install python dependencies.
+* Install Python dependencies.
 ```bash
 $ pip3 install -r requirements.txt
 ```
@@ -59,13 +59,11 @@ options:
   -d, --debug           Displays additional output and debugging information.
 
 Author: Andreas Georgiou (@superhedgy)
-Author: Andreas Georgiou (@superhedgy)
-
 ```                        
 
 Run HostHunter Screen Capture module and output a Nessus file:
 ```bash
-$ python3 hosthunter.py <targets.txt> -sc -f csv -o hosts.csv
+$ python3 hosthunter.py <targets.txt> --nessus -o hosts.csv
 ```
 Display Results
 ```bash
