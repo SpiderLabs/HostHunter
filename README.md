@@ -4,7 +4,7 @@
 [![Issues](https://img.shields.io/github/issues/SpiderLabs/HostHunter?style=popout)](https://github.com/SpiderLabs/HostHunter/issues)
 [![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?style=social)](https://twitter.com/superhedgy)
 
-HostHunter v1.6
+HostHunter v2 (Beta)
 ======
 
 A tool to efficiently discover and extract hostnames providing a large set of target IP addresses. HostHunter utilises simple OSINT techniques to map IP addresses with virtual hostnames. It generates a CSV or TXT file containing the results of the reconnaissance.
@@ -23,35 +23,6 @@ Click on the thumbnail above to view the demo.
 * Install python dependencies.
 ```bash
 $ pip3 install -r requirements.txt
-```
-
-The next few steps are only required if you would like to use the Screen Capture feature.
-
-* Download and install the latest version of Google Chrome.
-
-**Mac OS:**
-```bash
-$ brew cask install google-chrome
-```
-**Linux:**
-```bash
-
-$ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-
-$ dpkg -i ./google-chrome-stable_current_amd64.deb
-
-$ sudo apt-get install -f
-```
-
-* Download and install the latest ChromeDriver.
-
-**Mac OS:**
-```bash
-wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_mac64.zip && sudo unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/;
-```
-**Linux:**
-```bash
-wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_linux64.zip && sudo unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/;
 ```
 
 ## Simple Usage Example
