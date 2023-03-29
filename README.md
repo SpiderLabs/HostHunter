@@ -4,54 +4,25 @@
 [![Issues](https://img.shields.io/github/issues/SpiderLabs/HostHunter?style=popout)](https://github.com/SpiderLabs/HostHunter/issues)
 [![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?style=social)](https://twitter.com/superhedgy)
 
-HostHunter v1.6
+HostHunter v2 (Beta)
 ======
-
+<img align="center" src=https://github.com/SpiderLabs/HostHunter/blob/beta_v2/hosthunter_logo.png alt=logo height=%50 width=%50>
 A tool to efficiently discover and extract hostnames providing a large set of target IP addresses. HostHunter utilises simple OSINT techniques to map IP addresses with virtual hostnames. It generates a CSV or TXT file containing the results of the reconnaissance.
 
-Latest version of HostHunter also takes screenshots of the target web applicatiinos. This functionality is currently in beta.
+Latest version of HostHunter also verified output by resolving the discovered hostnames. This functionality is currently in beta.
 
 ## Demo
-<a href=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt><img src=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png alt=asciicast height=70% width=70%></a>
+<a  align="center" href=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt><img src=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png alt=asciicast height=70% width=70%></a>
 
-Click on the thumbnail above to view the demo.
+__Click on the thumbnail above to view the demo.__
 
 ## Installation
-* Tested with Python 3.7.2.
+* Tested with Python 3.10.8.
 
 ### Linux / Mac OS
-* Install python dependencies.
+* Install Python dependencies.
 ```bash
 $ pip3 install -r requirements.txt
-```
-
-The next few steps are only required if you would like to use the Screen Capture feature.
-
-* Download and install the latest version of Google Chrome.
-
-**Mac OS:**
-```bash
-$ brew cask install google-chrome
-```
-**Linux:**
-```bash
-
-$ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-
-$ dpkg -i ./google-chrome-stable_current_amd64.deb
-
-$ sudo apt-get install -f
-```
-
-* Download and install the latest ChromeDriver.
-
-**Mac OS:**
-```bash
-wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_mac64.zip && sudo unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/;
-```
-**Linux:**
-```bash
-wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_linux64.zip && sudo unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/;
 ```
 
 ## Simple Usage Example
@@ -66,33 +37,33 @@ $ cat vhosts.csv
 ## More Examples
 HostHunter Help Page
 ```bash
-$ python3 ./hosthunter.py targets.txt -h
-usage: hosthunter.py [-h] [-f FORMAT] [-o OUTPUT] [-sc] [-t TARGET] [-V] [targets]
+$ python3 ./hosthunter.py -h
+usage: hosthunter.py [-h] [-f FORMAT] [-o OUTPUT] [-t TARGET] [-g GRAB] [-v] [-V] [-d] [targets]
 
-[?] HostHunter v1.6 - Help Page
+[?] HostHunter v2.0 - Help Page
 
 positional arguments:
   targets               Sets the path of the target IPs file.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -f FORMAT, --format FORMAT
-                        Choose between CSV and TXT output file formats.
+                        Choose between .CSV and .TXT output file formats.
   -o OUTPUT, --output OUTPUT
                         Sets the path of the output file.
-  -sc, --screen-capture
-                        Capture a screenshot of any associated Web Applications.
   -t TARGET, --target TARGET
-                        Scan a Single IP.
+                        Hunt a Single IP.
+  -g GRAB, --grab GRAB  Choose which SSL ports to actively scan. Default ports: 21/tcp, 25/tcp, 443/tcp, 993/tcp, 8443/tcp
+  -v, --verify          Attempts to resolve IP Address
   -V, --version         Displays the current version.
+  -d, --debug           Displays additional output and debugging information.
 
 Author: Andreas Georgiou (@superhedgy)
-
 ```                        
 
 Run HostHunter Screen Capture module and output a Nessus file:
 ```bash
-$ python3 hosthunter.py <targets.txt> -sc -f csv -o hosts.csv
+$ python3 hosthunter.py <targets.txt> --nessus -o hosts.csv
 ```
 Display Results
 ```bash
@@ -114,14 +85,16 @@ $ open ./screen_captures/
 - [x] Verifies Internet access.
 - [x] Retrieves hostname values from services at 21/tcp, 25/tcp, 80/tcp and 443/tcp ports.
 - [x] Supports Nessus target format output.  
+- [x] Improve output (IPs, HostNames, FQDNs)  
+- [X] Actively pull SSL certificates from other TCP ports  
+- [X] Select with SSL ports to target
+- [X] Verify discovered hostnames against target IPs
 
 ## Coming Next
-- [ ] Improve output (IPs, HostNames, FQDNs)  
 - [ ] Pause and Resume Execution   
 - [ ] Support for a Premium HackerTarget API key   
 - [ ] Support for IPv6   
 - [ ] Gather information from additional APIs  
-- [ ] Actively pull SSL certificates from other TCP ports  
 
 ## Notes
 * Free APIs throttle the amount of requests per day per source IP address.

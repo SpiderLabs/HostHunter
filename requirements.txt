@@ -1,5 +1,5 @@
 requests
-selenium
+validator_collection
 urllib3
 fake_useragent
 pyOpenSSL
