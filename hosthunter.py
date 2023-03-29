@@ -150,6 +150,7 @@ def initialise():
             exit()
 
     if ipv6_on():
+        global ipv6_enabled
         ipv6_enabled=True
     else:
         ipv6_enabled=False
@@ -217,8 +218,6 @@ def validate(hostx):
 
 ## sslGrabber - IPv6
 def sslGrabber6(hostx,port):
-    print(hostx.address)
-    print (port)
     context = ssl.create_default_context()
     context.check_hostname = False
     context.verify_mode = ssl.CERT_OPTIONAL
