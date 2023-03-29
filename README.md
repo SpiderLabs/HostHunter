@@ -7,11 +7,8 @@
 HostHunter v2.0
 ======
 <img align="center" src=https://github.com/SpiderLabs/HostHunter/blob/beta_v2/hosthunter_logo.png alt=logo height=%50 width=%50>
-A tool to efficiently discover and extract hostnames providing a large set of target IPv4 or IPv6 addresses. HostHunter utilises simple OSINT and active reconaissance techniques to map IP targets with virtual hostnames. This is especially useful for discovering the true attack surface of your organisation.
- 
-Output can be generated in multiple formats including CSV, TXT or Nessus file formats.
-
-Latest version of HostHunter also verified output by resolving the discovered hostnames. This functionality is currently in beta.
+A tool to efficiently discover and extract hostnames providing a large set of target IPv4 or IPv6 addresses. HostHunter utilises simple OSINT and active reconaissance techniques to map IP targets with virtual hostnames. This is especially useful for discovering the true attack surface of your organisation.  
+Output can be generated in multiple formats including CSV, TXT or Nessus file formats. 
 
 ## Demo
 <a  align="center" href=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt><img src=https://asciinema.org/a/jp9B0IB6BzRAgbH3iNp7cCTpt.png alt=asciicast height=70% width=70%></a>
