@@ -16,7 +16,7 @@
 #
 # [+] Simple Usage Example:
 #
-#       $ python3 hosthunter.py <target_ips.txt>
+#       $ python3.10 hosthunter.py <target_ips.txt>
 #
 #       $ cat vhosts.csv
 
@@ -47,6 +47,8 @@ __author__ = "Andreas Georgiou (@superhedgy)"
 socket.setdefaulttimeout(3)
 global appsf
 global vhostsf
+global ipv6_enabled
+ipv6_enabled=False
 regx = "<li class=\"b_algo\"(.+?)</li>"
 pattern_url = re.compile(r"https?://(www\.)?|(/.*)?")
 pattern = re.compile(regx)
@@ -111,11 +113,11 @@ def initialise():
 
     if len(sys.argv) < 2:
         print("\n[*] Error: No Arguments provided. ")
-        print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv \n")
+        print("Example Usage: python3.10 hosthunter.py -t 8.8.8.8 -o vhosts.csv \n")
         exit()
 
     list_format=args.format.split(',')
-    print(list_format)
+
     for type in list_format:
         if type.lower() != "txt" and type.lower() != "csv" and  type.lower()!= "nessus" and type.lower()!= "all":
             print("\n[*] Error:  Output File Format is not supported. Choose between 'txt' or 'csv' or 'Nessus' or all .\n")
@@ -130,7 +132,7 @@ def initialise():
     if args.target and args.targets:
         print(
             "\n[*] Error: Too many arguments! Either select single target or specify a list of targets.")
-        print("Example Usage: python3 hosthunter.py -t 8.8.8.8 -o vhosts.csv\n")
+        print("Example Usage: python3.10 hosthunter.py -t 8.8.8.8 -o vhosts.csv\n")
         exit()
     # Targets Input File
     if args.targets and not os.path.exists(args.targets):
@@ -147,6 +149,10 @@ def initialise():
         else:
             exit()
 
+    if ipv6_on():
+        ipv6_enabled=True
+    else:
+        ipv6_enabled=False
 
 def read_targets():
     targets = []
@@ -178,7 +184,10 @@ def display_banner():
     print("\n", "HostHunter: ", __version__)
     print(" Author : ", __author__)
     print("\n" + "|" + "-" * 100 + "|", end="\n\n")
-
+    if ipv6_enabled:
+        print("[+] IPv6 Hunting is Enabled")
+    else:
+        print("[!] IPv6 Hunting is Disabled")
 
 class target:
     def __init__(self, address):
@@ -424,6 +433,18 @@ def verify(hostx):
 
     return len(hostx.hname)
 
+def ipv6_on():
+    try:
+        # Create a socket for IPv6 and connect to ipv6.google.com on port 80
+        sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        sock.connect(("ipv6.google.com", 443))
+        return True
+    except socket.error:
+        return False
+    finally:
+        sock.close()
+        return False
+
 # Main Function
 def main(argc, targets):
     counter = 0
@@ -441,7 +462,9 @@ def main(argc, targets):
             continue
         # Reverse DNS Lookup
         reverseiplookup(hostx)
-    #    sslGrabber6(hostx,443)
+
+        if ipv6_enabled==True:
+            sslGrabber6(hostx,443)
 
         # Fetch SSL Certificates [Default: 21, 25, 443, 993, 8443]
         for port in ports:
