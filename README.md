@@ -27,7 +27,7 @@ $ pip3 install -r requirements.txt
 
 ## Simple Usage Example
 ```bash
-$ python3 hosthunter.py <targets.txt>
+$ python3.10 hosthunter.py <targets.txt>
 ```
 
 ```bash
@@ -37,7 +37,7 @@ $ cat vhosts.csv
 ## More Examples
 HostHunter Help Page
 ```bash
-$ python3 ./hosthunter.py -h
+$ python3.10 ./hosthunter.py -h
 usage: hosthunter.py [-h] [-f FORMAT] [-o OUTPUT] [-t TARGET] [-g GRAB] [-v] [-V] [-d] [targets]
 
 [?] HostHunter v2.0 - Help Page
@@ -63,7 +63,7 @@ Author: Andreas Georgiou (@superhedgy)
 
 Run HostHunter Screen Capture module and output a Nessus file:
 ```bash
-$ python3 hosthunter.py <targets.txt> --nessus -o hosts.csv
+$ python3.10 hosthunter.py <targets.txt> --nessus -o hosts.csv
 ```
 Display Results
 ```bash
@@ -75,7 +75,7 @@ $ open ./screen_captures/
 ```
 
 ## Features
-- [x] Works with Python3  
+- [x] Works with Python3.10  
 - [x] Extracts information from SSL/TLS certificates.  
 - [x] Supports Free HackerTarget API requests.  
 - [x] Takes Screenshots of the target applications.  
@@ -89,11 +89,11 @@ $ open ./screen_captures/
 - [X] Actively pull SSL certificates from other TCP ports  
 - [X] Select with SSL ports to target
 - [X] Verify discovered hostnames against target IPs
+- [x] Support for IPv6   
 
 ## Coming Next
 - [ ] Pause and Resume Execution   
 - [ ] Support for a Premium HackerTarget API key   
-- [ ] Support for IPv6   
 - [ ] Gather information from additional APIs  
 
 ## Notes
