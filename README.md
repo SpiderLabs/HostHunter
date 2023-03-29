@@ -4,7 +4,7 @@
 [![Issues](https://img.shields.io/github/issues/SpiderLabs/HostHunter?style=popout)](https://github.com/SpiderLabs/HostHunter/issues)
 [![Twitter Follow](https://img.shields.io/twitter/follow/superhedgy.svg?style=social)](https://twitter.com/superhedgy)
 
-HostHunter v2 (Beta)
+HostHunter v2.0
 ======
 <img align="center" src=https://github.com/SpiderLabs/HostHunter/blob/beta_v2/hosthunter_logo.png alt=logo height=%50 width=%50>
 A tool to efficiently discover and extract hostnames providing a large set of target IP addresses. HostHunter utilises simple OSINT techniques to map IP addresses with virtual hostnames. It generates a CSV or TXT file containing the results of the reconnaissance.
