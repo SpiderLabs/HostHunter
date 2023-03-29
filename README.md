@@ -21,7 +21,7 @@ __Click on the thumbnail above to view the demo.__
 ### Linux / Mac OS
 * Install Python dependencies.
 ```bash
-$ pip3 install -r requirements.txt
+$ python3.10 -m pip install -r requirements.txt
 ```
 
 ## Simple Usage Example
