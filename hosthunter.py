@@ -442,7 +442,6 @@ def ipv6_on():
         return False
     finally:
         sock.close()
-        return False
 
 # Main Function
 def main(argc, targets):
@@ -462,7 +461,7 @@ def main(argc, targets):
         # Reverse DNS Lookup
         reverseiplookup(hostx)
 
-        if ipv6_enabled==True:
+        if ipv6_enabled==True & hostx.ipv6==True:
             sslGrabber6(hostx,443)
 
         # Fetch SSL Certificates [Default: 21, 25, 443, 993, 8443]
